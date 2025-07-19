@@ -36,6 +36,26 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
+.successMessage {
+  background: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #c3e6cb;
+  font-weight: 500;
+}
+
+.errorMessage {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #f5c6cb;
+  font-weight: 500;
+}
+
 .formGroup {
   margin-bottom: 1.5rem;
 }
@@ -64,6 +84,12 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.formGroup input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .formGroup input::placeholder {
   color: #999;
 }
@@ -89,13 +115,19 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.submitButton:hover {
+.submitButton:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
 }
 
-.submitButton:active {
+.submitButton:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .backButton {

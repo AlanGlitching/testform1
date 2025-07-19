@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 import styles from './Contact.module.css';
 
 function Contact() {
@@ -8,6 +9,8 @@ function Contact() {
     email: '',
     phone: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -17,12 +20,39 @@ function Contact() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
-    console.log('Contact form submitted:', formData);
-    alert('Thank you for your message! I will get back to you soon.');
-    setFormData({ name: '', email: '', phone: '' });
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      const { data, error } = await supabase
+        .from('contacts')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone || null,
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select();
+
+      if (error) {
+        console.error('Error submitting form:', error);
+        setSubmitStatus('error');
+        throw error;
+      }
+
+      console.log('Contact form submitted successfully:', data);
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', phone: '' });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -34,6 +64,18 @@ function Contact() {
       
       <main className={styles.main}>
         <form className={styles.form} onSubmit={handleSubmit}>
+          {submitStatus === 'success' && (
+            <div className={styles.successMessage}>
+              Thank you for your message! I will get back to you soon.
+            </div>
+          )}
+          
+          {submitStatus === 'error' && (
+            <div className={styles.errorMessage}>
+              Sorry, there was an error submitting your message. Please try again.
+            </div>
+          )}
+
           <div className={styles.formGroup}>
             <label htmlFor="name">Name *</label>
             <input
@@ -44,6 +86,7 @@ function Contact() {
               onChange={handleInputChange}
               required
               placeholder="Enter your full name"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -57,6 +100,7 @@ function Contact() {
               onChange={handleInputChange}
               required
               placeholder="Enter your email address"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -69,12 +113,17 @@ function Contact() {
               value={formData.phone}
               onChange={handleInputChange}
               placeholder="Enter your phone number"
+              disabled={isSubmitting}
             />
           </div>
 
           <div className={styles.formActions}>
-            <button type="submit" className={styles.submitButton}>
-              Send Message
+            <button 
+              type="submit" 
+              className={styles.submitButton}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Sending...' : 'Send Message'}
             </button>
             <Link to="/" className={styles.backButton}>
               Back to Home
