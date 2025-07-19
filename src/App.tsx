@@ -1,7 +1,9 @@
-import Clock from './components/Clock'
-import styles from './App.module.css'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Clock from './components/Clock';
+import Contact from './components/Contact';
+import styles from './App.module.css';
 
-function App() {
+function HomePage() {
   return (
     <div className={styles.app}>
       <header className={styles.header}>
@@ -10,9 +12,25 @@ function App() {
       </header>
       <main className={styles.main}>
         <Clock />
+        <div className={styles.contactSection}>
+          <Link to="/contact" className={styles.contactButton}>
+            Contact Me
+          </Link>
+        </div>
       </main>
     </div>
-  )
+  );
 }
 
-export default App 
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App; 
