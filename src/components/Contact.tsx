@@ -25,7 +25,14 @@ function Contact() {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
+    // Debug: Log environment variables
+    console.log('Environment variables check:');
+    console.log('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL);
+    console.log('VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Present' : 'Missing');
+
     try {
+      console.log('Attempting to insert data:', formData);
+      
       const { data, error } = await supabase
         .from('contacts')
         .insert([
@@ -39,7 +46,7 @@ function Contact() {
         .select();
 
       if (error) {
-        console.error('Error submitting form:', error);
+        console.error('Supabase error:', error);
         setSubmitStatus('error');
         throw error;
       }
@@ -73,6 +80,8 @@ function Contact() {
           {submitStatus === 'error' && (
             <div className={styles.errorMessage}>
               Sorry, there was an error submitting your message. Please try again.
+              <br />
+              <small>Check the browser console for more details.</small>
             </div>
           )}
 
