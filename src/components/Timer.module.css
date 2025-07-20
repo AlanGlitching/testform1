@@ -529,8 +529,44 @@
 
 .achievementText p {
   margin: 0;
-  font-size: 0.8rem;
-  opacity: 0.9;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.backButton {
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  text-decoration: none;
+  display: inline-block;
+  min-width: 160px;
+  text-align: center;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.backButton:active {
+  transform: translateY(-1px);
+}
+
+.navigation {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  width: 100%;
 }
 
 @media (max-width: 768px) {

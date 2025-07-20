@@ -411,9 +411,12 @@ const Alarm: React.FC<AlarmProps> = ({ onBack }) => {
           </button>
         </div>
       )}
-      <button className={styles.backButton} onClick={onBack}>
-        ⏰ Back to Clock
-      </button>
+      
+      <div className={styles.navigation}>
+        <button className={styles.backButton} onClick={onBack}>
+          ⏰ Back to Clock
+        </button>
+      </div>
     </div>
   );
 };

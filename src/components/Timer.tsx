@@ -535,9 +535,12 @@ const Timer: React.FC<TimerProps> = ({ onBack }) => {
           </div>
         </div>
       )}
-      <button className={styles.backButton} onClick={onBack}>
-        ⏰ Back to Clock
-      </button>
+      
+      <div className={styles.navigation}>
+        <button className={styles.backButton} onClick={onBack}>
+          ⏰ Back to Clock
+        </button>
+      </div>
     </div>
   );
 };

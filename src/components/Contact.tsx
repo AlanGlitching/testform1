@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import styles from './Contact.module.css';
 
-function Contact() {
+interface ContactProps {
+  onBack?: () => void;
+}
+
+const Contact: React.FC<ContactProps> = ({ onBack }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -11,6 +14,7 @@ function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,11 +28,18 @@ function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    setErrorMessage('');
 
-    // Debug: Log environment variables
-    console.log('Environment variables check:');
-    console.log('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL);
-    console.log('VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Present' : 'Missing');
+    // Check if Supabase is properly configured
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setSubmitStatus('error');
+      setErrorMessage('Oops! The contact form isn\'t set up yet. Drop me a DM instead! 😊');
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       console.log('Attempting to insert data:', formData);
@@ -48,6 +59,7 @@ function Contact() {
       if (error) {
         console.error('Supabase error:', error);
         setSubmitStatus('error');
+        setErrorMessage(error.message || 'Something went wrong! Give it another shot! 🎯');
         throw error;
       }
 
@@ -57,6 +69,9 @@ function Contact() {
     } catch (error) {
       console.error('Error submitting form:', error);
       setSubmitStatus('error');
+      if (!errorMessage) {
+        setErrorMessage('Network hiccup! Check your connection and try again! 🌐');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -64,29 +79,32 @@ function Contact() {
 
   return (
     <div className={styles.contact}>
-      <header className={styles.header}>
-        <h1>Contact Me</h1>
-        <p>Get in touch with me for any inquiries or collaborations</p>
-      </header>
+      <div className={styles.header}>
+        <h1>💬 Say Hi!</h1>
+        <p className={styles.subtitle}>Let's chat about your awesome project ideas! 🚀</p>
+        <button className={styles.backButton} onClick={onBack}>
+          ⏰ Back to Clock
+        </button>
+      </div>
       
       <main className={styles.main}>
         <form className={styles.form} onSubmit={handleSubmit}>
           {submitStatus === 'success' && (
             <div className={styles.successMessage}>
-              Thank you for your message! I will get back to you soon.
+              🎉 Woohoo! Thanks for reaching out! I'll get back to you super soon! ✨
             </div>
           )}
           
           {submitStatus === 'error' && (
             <div className={styles.errorMessage}>
-              Sorry, there was an error submitting your message. Please try again.
+              😅 {errorMessage || 'Oops! Something went wrong. No worries, try again!'}
               <br />
-              <small>Check the browser console for more details.</small>
+              <small>If it keeps acting up, just shoot me a message on social media! 📱</small>
             </div>
           )}
 
           <div className={styles.formGroup}>
-            <label htmlFor="name">Name *</label>
+            <label htmlFor="name">What should I call you? *</label>
             <input
               type="text"
               id="name"
@@ -94,13 +112,15 @@ function Contact() {
               value={formData.name}
               onChange={handleInputChange}
               required
-              placeholder="Enter your full name"
+              placeholder="Your awesome name here ✨"
               disabled={isSubmitting}
+              minLength={2}
+              maxLength={100}
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="email">Email *</label>
+            <label htmlFor="email">Where can I reach you? *</label>
             <input
               type="email"
               id="email"
@@ -108,21 +128,23 @@ function Contact() {
               value={formData.email}
               onChange={handleInputChange}
               required
-              placeholder="Enter your email address"
+              placeholder="your.email@example.com 📧"
               disabled={isSubmitting}
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="phone">Phone Number</label>
+            <label htmlFor="phone">Phone number (totally optional!)</label>
             <input
               type="tel"
               id="phone"
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
-              placeholder="Enter your phone number"
+              placeholder="Your digits if you prefer calls 📞"
               disabled={isSubmitting}
+              pattern="[\+]?[0-9\s\-\(\)]{10,}"
             />
           </div>
 
@@ -132,11 +154,15 @@ function Contact() {
               className={styles.submitButton}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Sending...' : 'Send Message'}
+              {isSubmitting ? '📤 Sending your message...' : '📤 Send it! 🚀'}
             </button>
-            <Link to="/" className={styles.backButton}>
-              Back to Home
-            </Link>
+            <button 
+              type="button"
+              className={styles.backButton}
+              onClick={onBack}
+            >
+              🏠 Back to Home
+            </button>
           </div>
         </form>
       </main>

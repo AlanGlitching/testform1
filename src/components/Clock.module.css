@@ -7,8 +7,8 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   width: 100%;
   transition: all 0.3s ease;
-  /* YouTube Shorts style - tall and narrow */
-  max-width: 400px;
+  /* Better responsive design */
+  max-width: 600px;
   min-height: 600px;
   display: flex;
   flex-direction: column;
@@ -17,6 +17,7 @@
   text-align: center;
   position: relative;
   z-index: 1;
+  margin: 0 auto;
 }
 
 .clockContainer.darkMode {
@@ -40,49 +41,50 @@
 .controls {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 2rem;
   gap: 1rem;
-  width: 100%;
-  z-index: 5;
-  position: relative;
+  margin-bottom: 2rem;
 }
 
 .timezoneSelector {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  max-width: 300px;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
 }
 
 .timezoneLabel {
+  color: white;
   font-size: 1rem;
   font-weight: 600;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .timezoneSelect {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
   color: white;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
 }
 
-.timezoneSelect:focus {
-  outline: none;
+.timezoneSelect:hover {
+  background: rgba(255, 255, 255, 0.3);
   border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .timezoneSelect option {
   background: #333;
   color: white;
+}
+
+.appControls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .formatControls {
@@ -308,26 +310,29 @@
   margin-top: 2rem;
   justify-content: center;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .navButton {
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   background: rgba(255, 255, 255, 0.2);
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 25px;
   color: white;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  min-width: 160px;
+  text-align: center;
 }
 
 .navButton:hover {
   background: rgba(255, 255, 255, 0.3);
   border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -502,7 +507,22 @@
   }
   
   .navButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    min-width: 140px;
+  }
+  
+  .appControls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .formatControls {
+    justify-content: center;
+  }
+  
+  .navButton {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
   }
 } 

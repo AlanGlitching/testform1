@@ -193,48 +193,6 @@ const Clock: React.FC<ClockProps> = ({ onNavigate }) => {
     }
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    // Check if it's dark mode based on current time
-    const hour = currentTime.getHours();
-    setIsDarkMode(hour < 6 || hour >= 18);
-  }, [currentTime]);
-
-  useEffect(() => {
-    // Simulate weather data (in a real app, you'd fetch from a weather API)
-    const mockWeather = {
-      temperature: Math.floor(Math.random() * 30) + 10,
-      condition: ['Sunny', 'Cloudy', 'Rainy', 'Clear'][Math.floor(Math.random() * 4)],
-      icon: ['☀️', '☁️', '🌧️', '🌙'][Math.floor(Math.random() * 4)],
-      humidity: Math.floor(Math.random() * 100),
-      windSpeed: Math.floor(Math.random() * 20),
-      precipitation: Math.floor(Math.random() * 100),
-      feelsLike: Math.floor(Math.random() * 10) + 10
-    };
-    setWeather(mockWeather);
-
-    // Calculate sunrise/sunset times (simplified)
-    const sunrise = new Date(currentTime);
-    sunrise.setHours(6, 30, 0, 0);
-    const sunset = new Date(currentTime);
-    sunset.setHours(18, 30, 0, 0);
-    
-    const dayLength = sunset.getTime() - sunrise.getTime();
-    
-    setSunData({
-      sunrise: sunrise.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-      sunset: sunset.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-      dayLength: Math.floor(dayLength / (1000 * 60 * 60))
-    });
-  }, [currentTime]);
-
   return (
     <div className={`${styles.clockContainer} ${isDarkMode ? styles.darkMode : ''}`}>
       <div className={styles.controls}>
@@ -251,6 +209,18 @@ const Clock: React.FC<ClockProps> = ({ onNavigate }) => {
               </option>
             ))}
           </select>
+        </div>
+        
+        <div className={styles.appControls}>
+          <button className={styles.navButton} onClick={() => onNavigate?.('timer')}>
+            ⏱️ Timer
+          </button>
+          <button className={styles.navButton} onClick={() => onNavigate?.('alarm')}>
+            ⏰ Alarm
+          </button>
+          <button className={styles.navButton} onClick={() => onNavigate?.('arcade')}>
+            🎮 Arcade
+          </button>
         </div>
         
         <div className={styles.formatControls}>
@@ -281,7 +251,7 @@ const Clock: React.FC<ClockProps> = ({ onNavigate }) => {
             <span className={styles.weatherCondition}>{weather.condition}</span>
             <button 
               className={styles.weatherAdviceButton}
-              onClick={() => onNavigate ? onNavigate('weather-advice') : window.location.href = '/weather-advice'}
+              onClick={() => onNavigate?.('weather-advice')}
               title="View Weather Advice"
             >
               🌤️
@@ -306,14 +276,11 @@ const Clock: React.FC<ClockProps> = ({ onNavigate }) => {
         </div>
 
         <div className={styles.navigation}>
-          <button className={styles.navButton} onClick={() => onNavigate?.('timer')}>
-            ⏱️ Timer
+          <button className={styles.navButton} onClick={() => onNavigate?.('contact')}>
+            📧 Contact Creator
           </button>
-          <button className={styles.navButton} onClick={() => onNavigate?.('alarm')}>
-            ⏰ Alarm
-          </button>
-          <button className={styles.navButton} onClick={() => onNavigate?.('arcade')}>
-            🎮 Arcade
+          <button className={styles.navButton} onClick={() => onNavigate?.('share')}>
+            📤 Share
           </button>
         </div>
       </div>
