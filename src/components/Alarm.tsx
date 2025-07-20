@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './Alarm.module.css';
 
 interface Alarm {
@@ -18,11 +18,9 @@ const Alarm: React.FC = () => {
   const [newAlarmRepeat, setNewAlarmRepeat] = useState<string[]>([]);
   const [newAlarmSound, setNewAlarmSound] = useState('default');
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingAlarm, setEditingAlarm] = useState<string | null>(null);
   const [snoozedAlarms, setSnoozedAlarms] = useState<Set<string>>(new Set());
   const [isAlarmRinging, setIsAlarmRinging] = useState(false);
   const [alarmSoundInterval, setAlarmSoundInterval] = useState<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const alarmSounds = [

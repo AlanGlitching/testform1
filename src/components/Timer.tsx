@@ -246,7 +246,7 @@ const Timer: React.FC = () => {
   };
 
   const checkAchievements = (completed: number, currentStreak: number) => {
-    const newAchievements = achievements.map(achievement => {
+    achievements.forEach(achievement => {
       let shouldUnlock = false;
       
       switch (achievement.id) {
@@ -271,10 +271,7 @@ const Timer: React.FC = () => {
         setCurrentAchievement(achievement);
         setShowAchievement(true);
         setTimeout(() => setShowAchievement(false), 3000);
-        return { ...achievement, unlocked: true };
       }
-      
-      return achievement;
     });
   };
 
