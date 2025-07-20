@@ -212,6 +212,25 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.weatherAdviceButton {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  margin-left: auto;
+}
+
+.weatherAdviceButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
 .seasonInfo {
   display: flex;
   gap: 1rem;
@@ -283,6 +302,34 @@
   overflow: hidden;
 }
 
+.navigation {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.navButton {
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.navButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 @media (max-width: 768px) {
   .clockContainer {
     max-width: 350px;
@@ -335,6 +382,11 @@
   
   .weatherCondition {
     font-size: 0.8rem;
+  }
+  
+  .weatherAdviceButton {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
   }
   
   .seasonInfo {
@@ -415,6 +467,11 @@
     font-size: 0.75rem;
   }
   
+  .weatherAdviceButton {
+    padding: 0.15rem 0.3rem;
+    font-size: 0.65rem;
+  }
+  
   .seasonInfo {
     padding: 0.3rem 0.6rem;
     gap: 0.5rem;
@@ -438,5 +495,14 @@
   
   .dayLength {
     font-size: 0.7rem;
+  }
+  .navigation {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .navButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
   }
 } 

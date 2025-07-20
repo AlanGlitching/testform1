@@ -16,7 +16,11 @@ interface SoundOption {
   audioUrl: string;
 }
 
-const Timer: React.FC = () => {
+interface TimerProps {
+  onBack?: () => void;
+}
+
+const Timer: React.FC<TimerProps> = ({ onBack }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [inputHours, setInputHours] = useState('0');
@@ -531,6 +535,9 @@ const Timer: React.FC = () => {
           </div>
         </div>
       )}
+      <button className={styles.backButton} onClick={onBack}>
+        ⏰ Back to Clock
+      </button>
     </div>
   );
 };

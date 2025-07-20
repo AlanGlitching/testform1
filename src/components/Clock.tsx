@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Clock.module.css';
-import Alarm from './Alarm';
-import Timer from './Timer';
 
 interface WeatherData {
   temperature: number;
   condition: string;
   icon: string;
+  humidity: number;
+  windSpeed: number;
+  precipitation: number;
+  feelsLike: number;
 }
 
 interface SunData {
@@ -15,11 +17,13 @@ interface SunData {
   dayLength: number;
 }
 
-const Clock: React.FC = () => {
+interface ClockProps {
+  onNavigate?: (page: string) => void;
+}
+
+const Clock: React.FC<ClockProps> = ({ onNavigate }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedTimezone, setSelectedTimezone] = useState('local');
-  const [showAlarm, setShowAlarm] = useState(false);
-  const [showTimer, setShowTimer] = useState(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [sunData, setSunData] = useState<SunData | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -77,17 +81,22 @@ const Clock: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Check if it's dark mode based on current time
-    const hour = currentTime.getHours();
+    // Check if it's dark mode based on current time in selected timezone
+    const timezoneTime = getTimezoneTime(selectedTimezone);
+    const hour = timezoneTime.getHours();
     setIsDarkMode(hour < 6 || hour >= 18);
-  }, [currentTime]);
+  }, [currentTime, selectedTimezone]);
 
   useEffect(() => {
     // Simulate weather data (in a real app, you'd fetch from a weather API)
     const mockWeather = {
       temperature: Math.floor(Math.random() * 30) + 10,
       condition: ['Sunny', 'Cloudy', 'Rainy', 'Clear'][Math.floor(Math.random() * 4)],
-      icon: ['☀️', '☁️', '🌧️', '🌙'][Math.floor(Math.random() * 4)]
+      icon: ['☀️', '☁️', '🌧️', '🌙'][Math.floor(Math.random() * 4)],
+      humidity: Math.floor(Math.random() * 100),
+      windSpeed: Math.floor(Math.random() * 20),
+      precipitation: Math.floor(Math.random() * 100),
+      feelsLike: Math.floor(Math.random() * 10) + 10
     };
     setWeather(mockWeather);
 
@@ -105,6 +114,20 @@ const Clock: React.FC = () => {
       dayLength: Math.floor(dayLength / (1000 * 60 * 60))
     });
   }, [currentTime]);
+
+  const getSeason = (date: Date): string => {
+    const month = date.getMonth();
+    if (month >= 2 && month <= 4) return '🌱 Spring';
+    if (month >= 5 && month <= 7) return '☀️ Summer';
+    if (month >= 8 && month <= 10) return '🍂 Fall';
+    return '❄️ Winter';
+  };
+
+  const getWeekNumber = (date: Date): number => {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  };
 
   const formatTime = (date: Date, timezone: string): string => {
     if (timezone === 'local') {
@@ -160,62 +183,60 @@ const Clock: React.FC = () => {
     }
   };
 
-  const formatTimezoneOffset = (timezone: string): string => {
+  const getTimezoneTime = (timezone: string): Date => {
     if (timezone === 'local') {
-      const offset = -new Date().getTimezoneOffset();
-      const hours = Math.floor(Math.abs(offset) / 60);
-      const minutes = Math.abs(offset) % 60;
-      const sign = offset >= 0 ? '+' : '-';
-      return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      return new Date();
     } else if (timezone === 'UTC') {
-      return '+00:00';
+      return new Date(new Date().toLocaleString('en-US', { timeZone: 'UTC' }));
     } else {
-      try {
-        const date = new Date();
-        const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
-        const targetTime = new Date(utc + (new Date().toLocaleString("en-US", { timeZone: timezone })));
-        const offset = (targetTime.getTime() - date.getTime()) / (1000 * 60 * 60);
-        const hours = Math.floor(Math.abs(offset));
-        const minutes = Math.floor((Math.abs(offset) - hours) * 60);
-        const sign = offset >= 0 ? '+' : '-';
-        return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-      } catch {
-        return 'N/A';
-      }
+      return new Date(new Date().toLocaleString('en-US', { timeZone: timezone }));
     }
   };
 
-  const getSeason = (date: Date): string => {
-    const month = date.getMonth();
-    if (month >= 2 && month <= 4) return '🌱 Spring';
-    if (month >= 5 && month <= 7) return '☀️ Summer';
-    if (month >= 8 && month <= 10) return '🍂 Fall';
-    return '❄️ Winter';
-  };
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
 
-  const getWeekNumber = (date: Date): number => {
-    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-  };
+    return () => clearInterval(timer);
+  }, []);
 
-  const toggleAlarm = () => {
-    setShowAlarm(!showAlarm);
-    setShowTimer(false);
-  };
+  useEffect(() => {
+    // Check if it's dark mode based on current time
+    const hour = currentTime.getHours();
+    setIsDarkMode(hour < 6 || hour >= 18);
+  }, [currentTime]);
 
-  const toggleTimer = () => {
-    setShowTimer(!showTimer);
-    setShowAlarm(false);
-  };
+  useEffect(() => {
+    // Simulate weather data (in a real app, you'd fetch from a weather API)
+    const mockWeather = {
+      temperature: Math.floor(Math.random() * 30) + 10,
+      condition: ['Sunny', 'Cloudy', 'Rainy', 'Clear'][Math.floor(Math.random() * 4)],
+      icon: ['☀️', '☁️', '🌧️', '🌙'][Math.floor(Math.random() * 4)],
+      humidity: Math.floor(Math.random() * 100),
+      windSpeed: Math.floor(Math.random() * 20),
+      precipitation: Math.floor(Math.random() * 100),
+      feelsLike: Math.floor(Math.random() * 10) + 10
+    };
+    setWeather(mockWeather);
 
-  const backToClock = () => {
-    setShowAlarm(false);
-    setShowTimer(false);
-  };
+    // Calculate sunrise/sunset times (simplified)
+    const sunrise = new Date(currentTime);
+    sunrise.setHours(6, 30, 0, 0);
+    const sunset = new Date(currentTime);
+    sunset.setHours(18, 30, 0, 0);
+    
+    const dayLength = sunset.getTime() - sunrise.getTime();
+    
+    setSunData({
+      sunrise: sunrise.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      sunset: sunset.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      dayLength: Math.floor(dayLength / (1000 * 60 * 60))
+    });
+  }, [currentTime]);
 
   return (
-    <div className={`${styles.clockContainer} ${showAlarm ? styles.alarmMode : ''} ${showTimer ? styles.timerMode : ''} ${isDarkMode ? styles.darkMode : ''}`}>
+    <div className={`${styles.clockContainer} ${isDarkMode ? styles.darkMode : ''}`}>
       <div className={styles.controls}>
         <div className={styles.timezoneSelector}>
           <label className={styles.timezoneLabel}>Timezone:</label>
@@ -233,80 +254,69 @@ const Clock: React.FC = () => {
         </div>
         
         <div className={styles.formatControls}>
-          {(showAlarm || showTimer) && (
-            <button
-              className={styles.backButton}
-              onClick={backToClock}
-            >
-              ⏰ Back to Clock
-            </button>
-          )}
-          <button
-            className={`${styles.alarmButton} ${showAlarm ? styles.active : ''}`}
-            onClick={toggleAlarm}
+          <button 
+            className={styles.darkModeToggle}
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            ⏰ Alarm
-          </button>
-          <button
-            className={`${styles.alarmButton} ${showTimer ? styles.active : ''}`}
-            onClick={toggleTimer}
-          >
-            ⏱️ Timer
+            {isDarkMode ? '☀️' : '🌙'}
           </button>
         </div>
       </div>
 
-      {!showAlarm && !showTimer && (
-        <div className={styles.clockContent}>
-          <div className={styles.timeDisplay}>
-            <div className={styles.time}>{formatTime(currentTime, selectedTimezone)}</div>
-            <div className={styles.date}>{formatDate(currentTime, selectedTimezone)}</div>
+      <div className={styles.clockContent}>
+        <div className={styles.timeDisplay}>
+          <div className={styles.time}>
+            {formatTime(currentTime, selectedTimezone)}
           </div>
-          
-          <div className={styles.additionalInfo}>
-            <div className={styles.timezone}>
-              {timezones.find(tz => tz.value === selectedTimezone)?.label} ({formatTimezoneOffset(selectedTimezone)})
-            </div>
-            
-            {weather && (
-              <div className={styles.weather}>
-                <span className={styles.weatherIcon}>{weather.icon}</span>
-                <span className={styles.weatherTemp}>{weather.temperature}°C</span>
-                <span className={styles.weatherCondition}>{weather.condition}</span>
-              </div>
-            )}
-            
-            <div className={styles.seasonInfo}>
-              <span>{getSeason(currentTime)}</span>
-              <span>Week {getWeekNumber(currentTime)}</span>
-            </div>
-            
-            {sunData && (
-              <div className={styles.sunInfo}>
-                <div className={styles.sunTimes}>
-                  <span>🌅 {sunData.sunrise}</span>
-                  <span>🌇 {sunData.sunset}</span>
-                </div>
-                <div className={styles.dayLength}>
-                  {sunData.dayLength}h daylight
-                </div>
-              </div>
-            )}
+          <div className={styles.date}>
+            {formatDate(currentTime, selectedTimezone)}
           </div>
         </div>
-      )}
 
-      {showAlarm && (
-        <div className={styles.alarmSection}>
-          <Alarm />
+        {weather && (
+          <div className={styles.weather}>
+            <span className={styles.weatherIcon}>{weather.icon}</span>
+            <span className={styles.weatherTemp}>{weather.temperature}°C</span>
+            <span className={styles.weatherCondition}>{weather.condition}</span>
+            <button 
+              className={styles.weatherAdviceButton}
+              onClick={() => onNavigate ? onNavigate('weather-advice') : window.location.href = '/weather-advice'}
+              title="View Weather Advice"
+            >
+              🌤️
+            </button>
+          </div>
+        )}
+        
+        <div className={styles.seasonInfo}>
+          <div className={styles.season}>
+            {getSeason(getTimezoneTime(selectedTimezone))}
+          </div>
+          <div className={styles.weekNumber}>
+            Week {getWeekNumber(getTimezoneTime(selectedTimezone))}
+          </div>
+          {sunData && (
+            <div className={styles.sunInfo}>
+              <div>🌅 {sunData.sunrise}</div>
+              <div>🌇 {sunData.sunset}</div>
+              <div>☀️ {sunData.dayLength}h</div>
+            </div>
+          )}
         </div>
-      )}
 
-      {showTimer && (
-        <div className={styles.timerSection}>
-          <Timer />
+        <div className={styles.navigation}>
+          <button className={styles.navButton} onClick={() => onNavigate?.('timer')}>
+            ⏱️ Timer
+          </button>
+          <button className={styles.navButton} onClick={() => onNavigate?.('alarm')}>
+            ⏰ Alarm
+          </button>
+          <button className={styles.navButton} onClick={() => onNavigate?.('arcade')}>
+            🎮 Arcade
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };

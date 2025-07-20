@@ -11,7 +11,11 @@ interface Alarm {
   sound: string;
 }
 
-const Alarm: React.FC = () => {
+interface AlarmProps {
+  onBack?: () => void;
+}
+
+const Alarm: React.FC<AlarmProps> = ({ onBack }) => {
   const [alarms, setAlarms] = useState<Alarm[]>([]);
   const [newAlarmTime, setNewAlarmTime] = useState('');
   const [newAlarmLabel, setNewAlarmLabel] = useState('');
@@ -407,6 +411,9 @@ const Alarm: React.FC = () => {
           </button>
         </div>
       )}
+      <button className={styles.backButton} onClick={onBack}>
+        ⏰ Back to Clock
+      </button>
     </div>
   );
 };
