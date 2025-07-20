@@ -1,0 +1,288 @@
+.share {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+  color: white;
+}
+
+.header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.main {
+  width: 100%;
+  max-width: 800px;
+}
+
+.shareCard {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.preview {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.preview h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.preview p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.features span {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.shareOptions {
+  padding: 2.5rem;
+}
+
+.shareOptions h3 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.socialButtons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.socialButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.socialButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.twitter {
+  background: #1DA1F2;
+}
+
+.facebook {
+  background: #1877F2;
+}
+
+.instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.linkedin {
+  background: #0077B5;
+}
+
+.whatsapp {
+  background: #25D366;
+}
+
+.email {
+  background: #EA4335;
+}
+
+.icon {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.nativeShare {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.nativeShareButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nativeShareButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.copyLink h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.linkContainer {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.linkInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #f8f9fa;
+  color: #666;
+}
+
+.copyButton {
+  padding: 0.75rem 1.5rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.copyButton:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.backButton,
+.contactButton {
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.backButton {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.contactButton {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.contactButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .share {
+    padding: 1rem;
+  }
+  
+  .header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .preview {
+    padding: 2rem;
+  }
+  
+  .preview h2 {
+    font-size: 2rem;
+  }
+  
+  .features {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .socialButtons {
+    grid-template-columns: 1fr;
+  }
+  
+  .linkContainer {
+    flex-direction: column;
+  }
+  
+  .actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .backButton,
+  .contactButton {
+    width: 100%;
+    text-align: center;
+  }
+} 

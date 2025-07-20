@@ -34,13 +34,24 @@
   align-items: center;
   flex: 1;
   gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 1rem;
 }
 
-.contactSection {
+.buttonSection {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
   margin-top: 2rem;
+  width: 100%;
+  z-index: 10;
+  position: relative;
 }
 
-.contactButton {
+.contactButton,
+.shareButton {
   display: inline-block;
   padding: 1rem 2rem;
   background: rgba(255, 255, 255, 0.2);
@@ -52,15 +63,43 @@
   border: 2px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  z-index: 20;
+  position: relative;
 }
 
-.contactButton:hover {
+.contactButton:hover,
+.shareButton:hover {
   background: rgba(255, 255, 255, 0.3);
   border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.contactButton:active {
+.contactButton:active,
+.shareButton:active {
   transform: translateY(0);
+}
+
+.shareButton {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.shareButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 600px) {
+  .buttonSection {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .contactButton,
+  .shareButton {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+  }
 } 

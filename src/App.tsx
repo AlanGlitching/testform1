@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Clock from './components/Clock';
 import Contact from './components/Contact';
+import Share from './components/Share';
 import styles from './App.module.css';
 
 function HomePage() {
@@ -12,9 +13,12 @@ function HomePage() {
       </header>
       <main className={styles.main}>
         <Clock />
-        <div className={styles.contactSection}>
+        <div className={styles.buttonSection}>
           <Link to="/contact" className={styles.contactButton}>
-            Contact Me
+            Contact Creators
+          </Link>
+          <Link to="/share" className={styles.shareButton}>
+            Share
           </Link>
         </div>
       </main>
@@ -28,6 +32,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/share" element={<Share />} />
       </Routes>
     </Router>
   );

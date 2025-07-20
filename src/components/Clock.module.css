@@ -2,97 +2,255 @@
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 20px;
-  padding: 3rem;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  transition: all 0.3s ease;
+  /* YouTube Shorts style - tall and narrow */
+  max-width: 400px;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  min-width: 450px;
+  position: relative;
+  z-index: 1;
+}
+
+.clockContainer.alarmMode {
+  /* When alarm is shown, make it more prominent */
+  min-height: 700px;
+  margin-bottom: 2rem;
+}
+
+.clockContainer.timerMode {
+  /* When timer is shown, make it more prominent */
+  min-height: 700px;
+  margin-bottom: 2rem;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  width: 100%;
+  z-index: 5;
+  position: relative;
 }
 
 .timezoneSelector {
-  margin-bottom: 2rem;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 300px;
 }
 
 .timezoneLabel {
-  display: block;
   font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .timezoneSelect {
-  width: 100%;
   padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 1rem;
-  font-family: 'Inter', sans-serif;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
   transition: all 0.3s ease;
 }
 
 .timezoneSelect:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.2);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .timezoneSelect option {
-  background: #2a2a2a;
+  background: #333;
   color: white;
-  padding: 0.5rem;
+}
+
+.formatControls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.backButton,
+.alarmButton {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  position: relative;
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.backButton:hover,
+.alarmButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.alarmButton.active {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+.clockContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+  justify-content: center;
+  z-index: 2;
+  position: relative;
 }
 
 .timeDisplay {
-  margin-bottom: 2rem;
+  text-align: center;
 }
 
 .time {
-  font-size: 4rem;
+  /* YouTube Shorts style - large, centered time */
+  font-size: 5rem;
   font-weight: 700;
-  font-family: 'Inter', monospace;
-  letter-spacing: 2px;
-  margin-bottom: 1rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: white;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 0.5rem;
+  font-family: 'Courier New', monospace;
+  line-height: 1;
 }
 
 .date {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   font-weight: 400;
-  opacity: 0.9;
-  text-transform: capitalize;
+  margin-bottom: 0.5rem;
 }
 
 .timezone {
-  font-size: 1rem;
-  font-weight: 300;
-  opacity: 0.7;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-weight: 500;
+  text-align: center;
   padding: 0.5rem 1rem;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  display: inline-block;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.alarmSection {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+  position: relative;
+  overflow: hidden;
+}
+
+.timerSection {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+  position: relative;
+  overflow: hidden;
 }
 
 @media (max-width: 768px) {
   .clockContainer {
-    min-width: 320px;
-    padding: 2rem;
+    max-width: 350px;
+    min-height: 500px;
+    padding: 1.5rem;
+  }
+  
+  .clockContainer.alarmMode {
+    min-height: 600px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .clockContainer.timerMode {
+    min-height: 600px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .timezoneSelector {
+    min-width: auto;
+  }
+  
+  .formatControls {
+    justify-content: center;
   }
   
   .time {
-    font-size: 3rem;
+    font-size: 4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .clockContainer {
+    max-width: 320px;
+    min-height: 450px;
+    padding: 1rem;
   }
   
-  .date {
-    font-size: 1.2rem;
+  .clockContainer.alarmMode {
+    min-height: 550px;
+    margin-bottom: 1rem;
   }
   
-  .timezoneSelect {
+  .clockContainer.timerMode {
+    min-height: 550px;
+    margin-bottom: 1rem;
+  }
+  
+  .backButton,
+  .alarmButton {
+    padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
 } 
