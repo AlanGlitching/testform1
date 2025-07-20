@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './Clock.module.css';
 import Alarm from './Alarm';
 import Timer from './Timer';
+import Games from './Games';
 
 interface WeatherData {
   temperature: number;
@@ -20,6 +21,7 @@ const Clock: React.FC = () => {
   const [selectedTimezone, setSelectedTimezone] = useState('local');
   const [showAlarm, setShowAlarm] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
+  const [showGames, setShowGames] = useState(false);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [sunData, setSunData] = useState<SunData | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -207,15 +209,23 @@ const Clock: React.FC = () => {
   const toggleTimer = () => {
     setShowTimer(!showTimer);
     setShowAlarm(false);
+    setShowGames(false);
+  };
+
+  const toggleGames = () => {
+    setShowGames(!showGames);
+    setShowAlarm(false);
+    setShowTimer(false);
   };
 
   const backToClock = () => {
     setShowAlarm(false);
     setShowTimer(false);
+    setShowGames(false);
   };
 
   return (
-    <div className={`${styles.clockContainer} ${showAlarm ? styles.alarmMode : ''} ${showTimer ? styles.timerMode : ''} ${isDarkMode ? styles.darkMode : ''}`}>
+    <div className={`${styles.clockContainer} ${showAlarm ? styles.alarmMode : ''} ${showTimer ? styles.timerMode : ''} ${showGames ? styles.gamesMode : ''} ${isDarkMode ? styles.darkMode : ''}`}>
       <div className={styles.controls}>
         <div className={styles.timezoneSelector}>
           <label className={styles.timezoneLabel}>Timezone:</label>
@@ -233,7 +243,7 @@ const Clock: React.FC = () => {
         </div>
         
         <div className={styles.formatControls}>
-          {(showAlarm || showTimer) && (
+          {(showAlarm || showTimer || showGames) && (
             <button
               className={styles.backButton}
               onClick={backToClock}
@@ -244,19 +254,28 @@ const Clock: React.FC = () => {
           <button
             className={`${styles.alarmButton} ${showAlarm ? styles.active : ''}`}
             onClick={toggleAlarm}
+            disabled={showAlarm || showTimer || showGames}
           >
             ⏰ Alarm
           </button>
           <button
             className={`${styles.alarmButton} ${showTimer ? styles.active : ''}`}
             onClick={toggleTimer}
+            disabled={showAlarm || showTimer || showGames}
           >
             ⏱️ Timer
+          </button>
+          <button
+            className={`${styles.alarmButton} ${showGames ? styles.active : ''}`}
+            onClick={toggleGames}
+            disabled={showAlarm || showTimer || showGames}
+          >
+            🎮 Games
           </button>
         </div>
       </div>
 
-      {!showAlarm && !showTimer && (
+      {!showAlarm && !showTimer && !showGames && (
         <div className={styles.clockContent}>
           <div className={styles.timeDisplay}>
             <div className={styles.time}>{formatTime(currentTime, selectedTimezone)}</div>
@@ -305,6 +324,12 @@ const Clock: React.FC = () => {
       {showTimer && (
         <div className={styles.timerSection}>
           <Timer />
+        </div>
+      )}
+
+      {showGames && (
+        <div className={styles.gamesSection}>
+          <Games />
         </div>
       )}
     </div>
