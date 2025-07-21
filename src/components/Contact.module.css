@@ -34,7 +34,7 @@
 }
 
 .form {
-  background: white;
+  background: #f3f4f8 !important; /* slightly off-white for contrast */
   padding: 2.5rem;
   border-radius: 25px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -77,23 +77,42 @@
   font-size: 1rem;
 }
 
-.formGroup input {
+.formGroup input,
+.formGroup input[type="text"],
+.formGroup input[type="email"],
+.formGroup input[type="tel"],
+.formGroup input:focus,
+.formGroup input:active {
   width: 100%;
   padding: 1rem 1.25rem;
-  border: 3px solid #e1e5e9;
+  border: 3px solid #667eea !important;
   border-radius: 15px;
   font-size: 1rem;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  background: #f8f9fa;
+  background: #f8f9fa !important;
+  color: #333 !important;
+  background-clip: padding-box !important;
 }
 
-.formGroup input:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-  background: white;
-  transform: translateY(-2px);
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f8f9fa inset !important;
+  box-shadow: 0 0 0 1000px #f8f9fa inset !important;
+  background-color: #f8f9fa !important;
+  color: #333 !important;
+  background-clip: padding-box !important;
+  border: 3px solid #667eea !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+input:-internal-autofill-selected {
+  background: #f8f9fa !important;
+  color: #333 !important;
+  background-clip: padding-box !important;
+  border: 3px solid #667eea !important;
 }
 
 .formGroup input:disabled {

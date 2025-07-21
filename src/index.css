@@ -41,3 +41,45 @@ body {
     background-color: #ffffff;
   }
 } 
+
+/* Autofill background fix for all input fields */
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f8f9fa inset !important;
+  box-shadow: 0 0 0 1000px #f8f9fa inset !important;
+  background-color: #f8f9fa !important;
+  color: #333 !important;
+  background-clip: padding-box !important;
+  border: 3px solid #667eea !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+input:-internal-autofill-selected {
+  background-color: #f8f9fa !important;
+  color: #333 !important;
+  background-clip: padding-box !important;
+  border: 3px solid #667eea !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+} 
+
+/* Strongest autofill override for all browsers, placed at the very end */
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffcccc inset !important;
+  box-shadow: 0 0 0 1000px #ffcccc inset !important;
+  background-color: #ffcccc !important;
+  color: #333 !important;
+  background-clip: padding-box !important;
+  border: 3px solid #667eea !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+input:-internal-autofill-selected {
+  background-color: #ffcccc !important;
+  color: #333 !important;
+  background-clip: padding-box !important;
+  border: 3px solid #667eea !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+} 
