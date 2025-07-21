@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './Arcade.module.css';
+import PacMan from './PacMan';
 
 interface SnakeSegment {
   x: number;
@@ -16,7 +17,7 @@ interface ArcadeProps {
 }
 
 const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
-  const [currentGame, setCurrentGame] = useState<'menu' | 'snake'>('menu');
+  const [currentGame, setCurrentGame] = useState<'menu' | 'snake' | 'pacman'>('menu');
   const [snake, setSnake] = useState<SnakeSegment[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Food>({ x: 15, y: 15 });
   const [direction, setDirection] = useState<'UP' | 'DOWN' | 'LEFT' | 'RIGHT'>('RIGHT');
@@ -62,11 +63,15 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
     }
   }, [generateFood]);
 
-  const startGame = useCallback(() => {
+  const startSnakeGame = useCallback(() => {
     resetGame();
     setGameRunning(true);
     setCurrentGame('snake');
   }, [resetGame]);
+
+  const startPacManGame = useCallback(() => {
+    setCurrentGame('pacman');
+  }, []);
 
   const moveSnake = useCallback(() => {
     if (!gameRunning) return;
@@ -224,12 +229,21 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
         </div>
 
         <div className={styles.gameMenu}>
-          <div className={styles.gameCard} onClick={startGame}>
+          <div className={styles.gameCard} onClick={startSnakeGame}>
             <div className={styles.gameIcon}>🐍</div>
             <h2>Snake Game</h2>
             <p>Classic snake game - eat berries and grow longer!</p>
             <div className={styles.highScore}>
               High Score: {highScore}
+            </div>
+          </div>
+
+          <div className={styles.gameCard} onClick={startPacManGame} style={{ borderColor: 'yellow', color: 'yellow' }}>
+            <div className={styles.gameIcon}>🟡</div>
+            <h2>Pac-Man</h2>
+            <p>Eat all the dots and avoid the ghosts!</p>
+            <div className={styles.highScore}>
+              Classic Maze Game
             </div>
           </div>
           
@@ -240,6 +254,12 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (currentGame === 'pacman') {
+    return (
+      <PacMan onBack={() => setCurrentGame('menu')} />
     );
   }
 
