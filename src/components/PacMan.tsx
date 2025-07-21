@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface PacManProps {
   onBack?: () => void;
@@ -32,10 +32,6 @@ const DIRS = [
 ];
 
 const GHOST_COLORS = ['red', 'pink', 'cyan', 'orange'];
-
-function getRandomDir() {
-  return DIRS[Math.floor(Math.random() * DIRS.length)];
-}
 
 function isWall(maze: number[][], x: number, y: number) {
   return maze[y] && maze[y][x] === 1;
@@ -116,7 +112,7 @@ const PacMan: React.FC<PacManProps> = ({ onBack }) => {
   useEffect(() => {
     if (win || gameOver) return;
     const handle = setInterval(() => {
-      setGhosts(prevGhosts => prevGhosts.map((ghost, idx) => {
+      setGhosts(prevGhosts => prevGhosts.map((ghost) => {
         if (ghost.dead) return { ...ghost, x: 9, y: 7, dead: false }; // respawn at center
         let { x, y, dir } = ghost;
         // Try to move in current dir, else pick random
@@ -127,7 +123,7 @@ const PacMan: React.FC<PacManProps> = ({ onBack }) => {
           isWall(moveRef.current.maze, nx, ny)
         ) {
           // Pick a new direction (not reverse)
-          let options = DIRS.map((d, i) => i).filter(i => i !== (dir ^ 1));
+          let options = DIRS.map((_, i) => i).filter(i => i !== (dir ^ 1));
           let valid = options.filter(i => {
             let tx = x + DIRS[i].dx;
             let ty = y + DIRS[i].dy;
