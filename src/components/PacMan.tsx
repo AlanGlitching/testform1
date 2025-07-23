@@ -52,6 +52,8 @@ const PacMan: React.FC<PacManProps> = ({ onBack }) => {
     { x: 9, y: 7, dir: 3, color: 3, dead: false },
   ]);
   const moveRef = useRef({ pacman, ghosts, maze, power, score, lives, win, gameOver });
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Keep refs in sync
   useEffect(() => {
@@ -176,6 +178,21 @@ const PacMan: React.FC<PacManProps> = ({ onBack }) => {
     });
   }, [ghosts, pacman, power, win, gameOver]);
 
+  // Music control: play/pause with game state
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if (!win && musicPlaying) {
+      audioRef.current.play();
+    } else {
+      audioRef.current.pause();
+    }
+  }, [win, musicPlaying]);
+
+  // Start music when game starts
+  useEffect(() => {
+    if (!win) setMusicPlaying(true);
+  }, [win]);
+
   // Render maze
   const renderMaze = () => (
     <div style={{ display: 'inline-block', background: 'black', padding: 8, borderRadius: 12 }}>
@@ -209,7 +226,11 @@ const PacMan: React.FC<PacManProps> = ({ onBack }) => {
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', color: 'yellow', background: 'black', borderRadius: '20px', padding: '2rem', boxShadow: '0 4px 24px rgba(0,0,0,0.5)'
     }}>
+      <audio ref={audioRef} src="/pacman-theme.mp3" loop preload="auto" />
       <h1 style={{ fontSize: '3rem', marginBottom: '1rem', fontWeight: 'bold', letterSpacing: '2px' }}>🟡 Pac-Man</h1>
+      <button onClick={() => setMusicPlaying(m => !m)} style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: musicPlaying ? 'yellow' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>
+        {musicPlaying ? 'Pause Music' : 'Play Music'}
+      </button>
       <div style={{ marginBottom: '1.5rem', color: 'white', fontSize: '1.2rem' }}>Score: {score} &nbsp; | &nbsp; Lives: {lives}</div>
       {renderMaze()}
       {win && <div style={{ color: 'lime', fontWeight: 'bold', fontSize: '2rem', margin: '1.5rem' }}>You Win!</div>}

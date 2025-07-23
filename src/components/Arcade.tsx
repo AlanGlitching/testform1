@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './Arcade.module.css';
 import PacMan from './PacMan';
+import Tetris from './Tetris';
 
 interface SnakeSegment {
   x: number;
@@ -17,7 +18,7 @@ interface ArcadeProps {
 }
 
 const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
-  const [currentGame, setCurrentGame] = useState<'menu' | 'snake' | 'pacman'>('menu');
+  const [currentGame, setCurrentGame] = useState<'menu' | 'snake' | 'pacman' | 'tetris'>('menu');
   const [snake, setSnake] = useState<SnakeSegment[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Food>({ x: 15, y: 15 });
   const [direction, setDirection] = useState<'UP' | 'DOWN' | 'LEFT' | 'RIGHT'>('RIGHT');
@@ -71,6 +72,10 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
 
   const startPacManGame = useCallback(() => {
     setCurrentGame('pacman');
+  }, []);
+
+  const startTetrisGame = useCallback(() => {
+    setCurrentGame('tetris');
   }, []);
 
   const moveSnake = useCallback(() => {
@@ -246,6 +251,15 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
               Classic Maze Game
             </div>
           </div>
+
+          <div className={styles.gameCard} onClick={startTetrisGame} style={{ borderColor: '#00f0f0', color: '#00f0f0' }}>
+            <div className={styles.gameIcon}>🟦</div>
+            <h2>Tetris</h2>
+            <p>Stack the blocks and clear lines!</p>
+            <div className={styles.highScore}>
+              Classic Puzzle Game
+            </div>
+          </div>
           
           <div className={styles.comingSoon}>
             <div className={styles.gameIcon}>🎯</div>
@@ -260,6 +274,12 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
   if (currentGame === 'pacman') {
     return (
       <PacMan onBack={() => setCurrentGame('menu')} />
+    );
+  }
+
+  if (currentGame === 'tetris') {
+    return (
+      <Tetris onBack={() => setCurrentGame('menu')} />
     );
   }
 
