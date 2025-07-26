@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './Arcade.module.css';
 import PacMan from './PacMan';
 import Tetris from './Tetris';
+import TicTacToe from './TicTacToe';
+import MultiplayerTicTacToe from './MultiplayerTicTacToe';
 
 interface SnakeSegment {
   x: number;
@@ -18,7 +20,7 @@ interface ArcadeProps {
 }
 
 const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
-  const [currentGame, setCurrentGame] = useState<'menu' | 'snake' | 'pacman' | 'tetris'>('menu');
+  const [currentGame, setCurrentGame] = useState<'menu' | 'snake' | 'pacman' | 'tetris' | 'tictactoe' | 'multiplayer-tictactoe'>('menu');
   const [snake, setSnake] = useState<SnakeSegment[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Food>({ x: 15, y: 15 });
   const [direction, setDirection] = useState<'UP' | 'DOWN' | 'LEFT' | 'RIGHT'>('RIGHT');
@@ -76,6 +78,14 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
 
   const startTetrisGame = useCallback(() => {
     setCurrentGame('tetris');
+  }, []);
+
+  const startTicTacToeGame = useCallback(() => {
+    setCurrentGame('tictactoe');
+  }, []);
+
+  const startMultiplayerTicTacToeGame = useCallback(() => {
+    setCurrentGame('multiplayer-tictactoe');
   }, []);
 
   const moveSnake = useCallback(() => {
@@ -260,6 +270,24 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
               Classic Puzzle Game
             </div>
           </div>
+
+          <div className={styles.gameCard} onClick={startTicTacToeGame} style={{ borderColor: '#ff6b6b', color: '#ff6b6b' }}>
+            <div className={styles.gameIcon}>⭕</div>
+            <h2>Tic Tac Toe</h2>
+            <p>Classic X's and O's game!</p>
+            <div className={styles.highScore}>
+              Two Player Game
+            </div>
+          </div>
+
+          <div className={styles.gameCard} onClick={startMultiplayerTicTacToeGame} style={{ borderColor: '#00bcd4', color: '#00bcd4' }}>
+            <div className={styles.gameIcon}>🌐</div>
+            <h2>Multiplayer Tic Tac Toe</h2>
+            <p>Play with friends across devices!</p>
+            <div className={styles.highScore}>
+              Online Multiplayer
+            </div>
+          </div>
           
           <div className={styles.comingSoon}>
             <div className={styles.gameIcon}>🎯</div>
@@ -280,6 +308,18 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
   if (currentGame === 'tetris') {
     return (
       <Tetris onBack={() => setCurrentGame('menu')} />
+    );
+  }
+
+  if (currentGame === 'tictactoe') {
+    return (
+      <TicTacToe onBack={() => setCurrentGame('menu')} />
+    );
+  }
+
+  if (currentGame === 'multiplayer-tictactoe') {
+    return (
+      <MultiplayerTicTacToe onBack={() => setCurrentGame('menu')} />
     );
   }
 
