@@ -86,7 +86,6 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
   const dasRef = useRef<{ [key: string]: NodeJS.Timeout | null }>({});
   const [musicPlaying, setMusicPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [audioLoaded, setAudioLoaded] = useState(false);
   const [audioInstance, setAudioInstance] = useState<HTMLAudioElement | null>(null);
 
   // Start or restart the game
@@ -123,19 +122,6 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     }
     setMusicPlaying(false);
   };
-
-  // Handle audio loading
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener('canplaythrough', () => {
-        console.log('Audio loaded successfully');
-        setAudioLoaded(true);
-      });
-      audioRef.current.addEventListener('error', (e) => {
-        console.error('Audio error:', e);
-      });
-    }
-  }, []);
 
   // Cleanup audio on unmount
   useEffect(() => {
