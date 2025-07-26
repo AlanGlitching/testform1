@@ -336,7 +336,12 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
                 <li>Update the SERVER_URL in this component</li>
                 <li>Redeploy the frontend to Netlify</li>
               </ol>
-              <p><strong>For local testing:</strong> Make sure the server is running on your computer.</p>
+              <p><strong>For local testing:</strong></p>
+              <ul>
+                <li>Double-click <code>start-local-server.bat</code> in the project root</li>
+                <li>Or run: <code>cd server && npm start</code></li>
+                <li>Then open the game in another browser window/tab</li>
+              </ul>
             </div>
           )}
         </div>
