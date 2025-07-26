@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Railway specific configuration
 const PORT = process.env.PORT || 3001;
-const HOST = '0.0.0.0';
+const HOST = process.env.HOST || '0.0.0.0';
 
 const app = express();
 const server = createServer(app);
@@ -14,7 +14,14 @@ const wss = new WebSocketServer({ server });
 
 // Middleware
 app.use(cors({
-  origin: ['https://testform1-production.up.railway.app', 'http://localhost:5173', 'http://localhost:3000', 'https://*.netlify.app'],
+  origin: [
+    'https://testform1-production.up.railway.app',
+    'http://localhost:5173', 
+    'http://localhost:3000', 
+    'https://*.netlify.app',
+    'https://testform1.netlify.app',
+    'https://testform1-production.netlify.app'
+  ],
   credentials: true
 }));
 app.use(express.json());
@@ -372,10 +379,14 @@ app.get('/', (req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`🚀 Tic Tac Toe Server running on port ${PORT}`);
+  console.log(`🌐 Host: ${HOST}`);
   console.log(`📊 Active games: ${games.size}, Connected players: ${players.size}`);
   console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔗 Server URL: http://${HOST}:${PORT}`);
 }).on('error', (error) => {
   console.error('❌ Server failed to start:', error);
+  console.error('❌ Error details:', error.message);
+  console.error('❌ Port:', PORT, 'Host:', HOST);
   process.exit(1);
 });
 
