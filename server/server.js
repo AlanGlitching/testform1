@@ -373,6 +373,10 @@ app.get('/', (req, res) => {
 server.listen(PORT, HOST, () => {
   console.log(`🚀 Tic Tac Toe Server running on port ${PORT}`);
   console.log(`📊 Active games: ${games.size}, Connected players: ${players.size}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+}).on('error', (error) => {
+  console.error('❌ Server failed to start:', error);
+  process.exit(1);
 });
 
 // Clean up inactive games (older than 1 hour)
