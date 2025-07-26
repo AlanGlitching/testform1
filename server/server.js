@@ -4,6 +4,10 @@ import { createServer } from 'http';
 import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
 
+// Railway specific configuration
+const PORT = process.env.PORT || 3001;
+const HOST = '0.0.0.0';
+
 const app = express();
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
@@ -351,13 +355,22 @@ app.get('/health', (req, res) => {
     status: 'ok',
     games: games.size,
     players: players.size,
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    port: PORT
+  });
+});
+
+// Root endpoint for Railway
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Tic Tac Toe Multiplayer Server',
+    status: 'running',
     timestamp: new Date().toISOString()
   });
 });
 
-const PORT = process.env.PORT || 3001;
-
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, HOST, () => {
   console.log(`🚀 Tic Tac Toe Server running on port ${PORT}`);
   console.log(`📊 Active games: ${games.size}, Connected players: ${players.size}`);
 });
