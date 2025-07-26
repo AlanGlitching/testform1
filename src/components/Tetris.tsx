@@ -86,6 +86,8 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
   const dasRef = useRef<{ [key: string]: NodeJS.Timeout | null }>({});
   const [musicPlaying, setMusicPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [audioLoaded, setAudioLoaded] = useState(false);
+  const [audioInstance, setAudioInstance] = useState<HTMLAudioElement | null>(null);
 
   // Start or restart the game
   function startGame() {
@@ -96,6 +98,54 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     setGameState('playing');
     setMusicPlaying(true);
   }
+
+  // Create new audio instance on play
+  const playMusic = () => {
+    console.log('Creating new audio instance...');
+    const audio = new Audio('/tetris-theme.mp3');
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play().then(() => {
+      console.log('Audio started successfully with new instance');
+      setAudioInstance(audio);
+      setMusicPlaying(true);
+    }).catch((error) => {
+      console.error('Failed to play audio:', error);
+    });
+  };
+
+  const stopMusic = () => {
+    console.log('Stopping audio...');
+    if (audioInstance) {
+      audioInstance.pause();
+      audioInstance.currentTime = 0;
+      setAudioInstance(null);
+    }
+    setMusicPlaying(false);
+  };
+
+  // Handle audio loading
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.addEventListener('canplaythrough', () => {
+        console.log('Audio loaded successfully');
+        setAudioLoaded(true);
+      });
+      audioRef.current.addEventListener('error', (e) => {
+        console.error('Audio error:', e);
+      });
+    }
+  }, []);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioInstance) {
+        audioInstance.pause();
+        audioInstance.currentTime = 0;
+      }
+    };
+  }, [audioInstance]);
 
   // Drop logic
   useEffect(() => {
@@ -341,17 +391,9 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
       <button
         onClick={() => {
           if (!musicPlaying) {
-            setMusicPlaying(true);
-            if (audioRef.current) {
-              audioRef.current.muted = false;
-              audioRef.current.play();
-            }
+            playMusic();
           } else {
-            setMusicPlaying(false);
-            if (audioRef.current) {
-              audioRef.current.pause();
-              audioRef.current.muted = true;
-            }
+            stopMusic();
           }
         }}
         style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: musicPlaying ? '#00f0f0' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}
