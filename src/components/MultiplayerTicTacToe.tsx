@@ -18,15 +18,11 @@ interface Game {
   gameStarted: boolean;
 }
 
-interface PlayerInfo {
-  id: string;
-  symbol: Player;
-}
+
 
 const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) => {
   const [gameState, setGameState] = useState<GameState>('lobby');
   const [roomId, setRoomId] = useState<string>('');
-  const [playerId, setPlayerId] = useState<string>('');
   const [playerSymbol, setPlayerSymbol] = useState<Player>('X');
   const [game, setGame] = useState<Game | null>(null);
   const [availableRooms, setAvailableRooms] = useState<Array<{ id: string; players: number }>>([]);
@@ -93,7 +89,7 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
   const handleServerMessage = (message: any) => {
     switch (message.type) {
       case 'connected':
-        setPlayerId(message.playerId);
+        // Player ID received from server (not used in UI)
         break;
         
       case 'room_created':
