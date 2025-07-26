@@ -33,11 +33,10 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // For local development
-  // const SERVER_URL = 'ws://192.168.31.164:3001';
-  
-  // For production deployment
-  const SERVER_URL = 'wss://testform1-production.up.railway.app';
+  // Try Railway first, fallback to localhost
+  const SERVER_URL = window.location.hostname === 'localhost' 
+    ? 'ws://192.168.31.164:3001'
+    : 'wss://testform1-production.up.railway.app';
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -82,7 +81,9 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
 
       ws.onerror = (error) => {
         console.error('WebSocket error:', error);
-        setError('Connection error. Please check if the server is running.');
+        const isLocalhost = window.location.hostname === 'localhost';
+        const serverUrl = isLocalhost ? 'localhost:3001' : 'Railway server';
+        setError(`Connection error to ${serverUrl}. Please check if the server is running.`);
       };
     } catch (error) {
       console.error('Failed to connect:', error);
@@ -191,11 +192,11 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
 
   const fetchAvailableRooms = async () => {
     try {
-      // For local development
-      // const response = await fetch('http://192.168.31.164:3001/api/rooms');
-      
-      // For production deployment
-      const response = await fetch('https://testform1-production.up.railway.app/api/rooms');
+      // Try Railway first, fallback to localhost
+      const apiUrl = window.location.hostname === 'localhost' 
+        ? 'http://192.168.31.164:3001/api/rooms'
+        : 'https://testform1-production.up.railway.app/api/rooms';
+      const response = await fetch(apiUrl);
       const rooms = await response.json();
       setAvailableRooms(rooms);
     } catch (error) {
