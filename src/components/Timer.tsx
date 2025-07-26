@@ -38,7 +38,6 @@ const Timer: React.FC<TimerProps> = ({ onBack }) => {
   const [isTimerComplete, setIsTimerComplete] = useState(false);
   const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const quotes = [
     "Time is what we want most, but what we use worst. - William Penn",
@@ -101,9 +100,7 @@ const Timer: React.FC<TimerProps> = ({ onBack }) => {
     // Set random motivational quote
     setMotivationalQuote(quotes[Math.floor(Math.random() * quotes.length)]);
 
-    // Initialize audio element
-    audioRef.current = new Audio();
-    audioRef.current.volume = volume;
+
 
     // Cleanup function
     return () => {
@@ -143,16 +140,9 @@ const Timer: React.FC<TimerProps> = ({ onBack }) => {
     // Save settings to localStorage
     localStorage.setItem('timerSound', selectedSound);
     localStorage.setItem('timerVolume', volume.toString());
-    
-    // Update audio volume
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
   }, [selectedSound, volume]);
 
   const playTimerSound = async (continuous: boolean = false) => {
-    if (!audioRef.current) return;
-
     const selectedSoundOption = soundOptions.find(sound => sound.value === selectedSound);
     if (!selectedSoundOption) return;
 

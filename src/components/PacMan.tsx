@@ -53,12 +53,55 @@ const PacMan: React.FC<PacManProps> = ({ onBack }) => {
   ]);
   const moveRef = useRef({ pacman, ghosts, maze, power, score, lives, win, gameOver });
   const [musicPlaying, setMusicPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [audioInstance, setAudioInstance] = useState<HTMLAudioElement | null>(null);
 
   // Keep refs in sync
   useEffect(() => {
     moveRef.current = { pacman, ghosts, maze, power, score, lives, win, gameOver };
   }, [pacman, ghosts, maze, power, score, lives, win, gameOver]);
+
+  // Create new audio instance on play
+  const playMusic = () => {
+    console.log('Creating new PacMan audio instance...');
+    const audio = new Audio('/PacMan Original Theme.mp3');
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play().then(() => {
+      console.log('PacMan audio started successfully');
+      setAudioInstance(audio);
+      setMusicPlaying(true);
+    }).catch((error) => {
+      console.error('Failed to play PacMan audio:', error);
+    });
+  };
+
+  const stopMusic = () => {
+    console.log('Stopping PacMan audio...');
+    if (audioInstance) {
+      audioInstance.pause();
+      audioInstance.currentTime = 0;
+      setAudioInstance(null);
+    }
+    setMusicPlaying(false);
+  };
+
+  const toggleMusic = () => {
+    if (musicPlaying) {
+      stopMusic();
+    } else {
+      playMusic();
+    }
+  };
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioInstance) {
+        audioInstance.pause();
+        audioInstance.currentTime = 0;
+      }
+    };
+  }, [audioInstance]);
 
   // Pac-Man movement
   useEffect(() => {
@@ -178,19 +221,13 @@ const PacMan: React.FC<PacManProps> = ({ onBack }) => {
     });
   }, [ghosts, pacman, power, win, gameOver]);
 
-  // Music control: play/pause with game state
-  useEffect(() => {
-    if (!audioRef.current) return;
-    if (!win && musicPlaying) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
-    }
-  }, [win, musicPlaying]);
+
 
   // Start music when game starts
   useEffect(() => {
-    if (!win) setMusicPlaying(true);
+    if (!win && !musicPlaying) {
+      playMusic();
+    }
   }, [win]);
 
   // Render maze
@@ -226,9 +263,8 @@ const PacMan: React.FC<PacManProps> = ({ onBack }) => {
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', color: 'yellow', background: 'black', borderRadius: '20px', padding: '2rem', boxShadow: '0 4px 24px rgba(0,0,0,0.5)'
     }}>
-      <audio ref={audioRef} src="/pacman-theme.mp3" loop preload="auto" />
       <h1 style={{ fontSize: '3rem', marginBottom: '1rem', fontWeight: 'bold', letterSpacing: '2px' }}>🟡 Pac-Man</h1>
-      <button onClick={() => setMusicPlaying(m => !m)} style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: musicPlaying ? 'yellow' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>
+      <button onClick={toggleMusic} style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: musicPlaying ? 'yellow' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>
         {musicPlaying ? 'Pause Music' : 'Play Music'}
       </button>
       <div style={{ marginBottom: '1.5rem', color: 'white', fontSize: '1.2rem' }}>Score: {score} &nbsp; | &nbsp; Lives: {lives}</div>

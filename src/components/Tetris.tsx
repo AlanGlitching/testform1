@@ -85,7 +85,6 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
   const repeatRef = useRef<{ [key: string]: NodeJS.Timeout | null }>({});
   const dasRef = useRef<{ [key: string]: NodeJS.Timeout | null }>({});
   const [musicPlaying, setMusicPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [audioInstance, setAudioInstance] = useState<HTMLAudioElement | null>(null);
 
   // Start or restart the game
@@ -95,13 +94,15 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     setNext(randomTetromino());
     setScore(0);
     setGameState('playing');
-    setMusicPlaying(true);
+    if (!musicPlaying) {
+      playMusic();
+    }
   }
 
   // Create new audio instance on play
   const playMusic = () => {
     console.log('Creating new audio instance...');
-    const audio = new Audio('/tetris-theme.mp3');
+    const audio = new Audio('/Original Tetris theme (Tetris Soundtrack).mp3');
     audio.loop = true;
     audio.volume = 0.5;
     audio.play().then(() => {
@@ -118,8 +119,17 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     if (audioInstance) {
       audioInstance.pause();
       audioInstance.currentTime = 0;
+      setAudioInstance(null);
     }
     setMusicPlaying(false);
+  };
+
+  const toggleMusic = () => {
+    if (musicPlaying) {
+      stopMusic();
+    } else {
+      playMusic();
+    }
   };
 
   // Cleanup audio on unmount
@@ -197,15 +207,7 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     };
   }, [gameState, current, board]);
 
-  // Music control: play/pause with game state
-  useEffect(() => {
-    if (!audioRef.current) return;
-    if (gameState === 'playing' && musicPlaying) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
-    }
-  }, [gameState, musicPlaying]);
+
 
   function move(dx: number, dy: number) {
     if (gameState !== 'playing') return false;
@@ -259,7 +261,20 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
   }
 
   function togglePause() {
-    setGameState(state => (state === 'playing' ? 'paused' : state === 'paused' ? 'playing' : state));
+    setGameState(state => {
+      if (state === 'playing') {
+        if (audioInstance) {
+          audioInstance.pause();
+        }
+        return 'paused';
+      } else if (state === 'paused') {
+        if (audioInstance && musicPlaying) {
+          audioInstance.play();
+        }
+        return 'playing';
+      }
+      return state;
+    });
   }
 
   function renderBoard() {
@@ -367,20 +382,13 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 0%, #414345 100%)', color: 'white', padding: 24, position: 'relative' }}>
-      {renderOverlay()}
-      <audio ref={audioRef} src="/tetris-theme.mp3" loop preload="auto" muted />
-      <h1 style={{ fontSize: '2.5rem', margin: '1rem 0' }}>Tetris</h1>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 0%, #414345 100%)', color: 'white', padding: 24, position: 'relative' }}>
+        {renderOverlay()}
+        <h1 style={{ fontSize: '2.5rem', margin: '1rem 0' }}>Tetris</h1>
       <button onClick={onBack} style={{ marginBottom: 16, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: '#444', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Back</button>
       <button onClick={startGame} style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: '#00f0f0', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>Restart</button>
       <button
-        onClick={() => {
-          if (musicPlaying) {
-            stopMusic();
-          } else {
-            playMusic();
-          }
-        }}
+        onClick={toggleMusic}
         style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: musicPlaying ? '#00f0f0' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}
       >
         {musicPlaying ? 'Pause Music' : 'Play Music'}
