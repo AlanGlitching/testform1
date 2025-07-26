@@ -334,7 +334,7 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #232526 0%, #414345 100%)', color: 'white', padding: 24, position: 'relative' }}>
       {renderOverlay()}
-      <audio ref={audioRef} src="/tetris-theme.mp3" loop preload="auto" />
+      <audio ref={audioRef} src="/tetris-theme.mp3" loop preload="auto" muted />
       <h1 style={{ fontSize: '2.5rem', margin: '1rem 0' }}>Tetris</h1>
       <button onClick={onBack} style={{ marginBottom: 16, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: '#444', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Back</button>
       <button onClick={startGame} style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: '#00f0f0', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>Restart</button>
@@ -342,10 +342,16 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
         onClick={() => {
           if (!musicPlaying) {
             setMusicPlaying(true);
-            audioRef.current?.play();
+            if (audioRef.current) {
+              audioRef.current.muted = false;
+              audioRef.current.play();
+            }
           } else {
             setMusicPlaying(false);
-            audioRef.current?.pause();
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.muted = true;
+            }
           }
         }}
         style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: musicPlaying ? '#00f0f0' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}
