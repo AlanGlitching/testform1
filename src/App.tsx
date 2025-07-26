@@ -1,11 +1,19 @@
 import { useState } from 'react';
+import './App.module.css';
 import Clock from './components/Clock';
 import Timer from './components/Timer';
 import Alarm from './components/Alarm';
-import WeatherAdvice from './components/WeatherAdvice';
-import Arcade from './components/Arcade';
 import Contact from './components/Contact';
 import Share from './components/Share';
+import WeatherAdvice from './components/WeatherAdvice';
+import Arcade from './components/Arcade';
+
+// Debug environment variables
+console.log('Environment check:', {
+  supabaseUrl: import.meta.env.VITE_SUPABASE_URL ? 'Set' : 'Missing',
+  supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Set' : 'Missing',
+  nodeEnv: import.meta.env.MODE
+});
 
 type Page = 'clock' | 'timer' | 'alarm' | 'weather-advice' | 'arcade' | 'contact' | 'share';
 
