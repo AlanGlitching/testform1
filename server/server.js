@@ -9,7 +9,10 @@ const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['https://your-netlify-app.netlify.app', 'http://localhost:5173', 'http://localhost:3000'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Game state management

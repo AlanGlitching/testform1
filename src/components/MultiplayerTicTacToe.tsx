@@ -33,7 +33,11 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // For local development
   const SERVER_URL = 'ws://192.168.31.164:3001';
+  
+  // For production deployment, uncomment and replace with your Railway URL:
+  // const SERVER_URL = 'wss://your-app-name.railway.app';
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -187,7 +191,11 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
 
   const fetchAvailableRooms = async () => {
     try {
+      // For local development
       const response = await fetch('http://192.168.31.164:3001/api/rooms');
+      
+      // For production deployment, uncomment and replace with your Railway URL:
+      // const response = await fetch('https://your-app-name.railway.app/api/rooms');
       const rooms = await response.json();
       setAvailableRooms(rooms);
     } catch (error) {
@@ -318,6 +326,17 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
       {error && (
         <div className={styles.error}>
           {error}
+          {error.includes('Connection error') && (
+            <div className={styles.deploymentInfo}>
+              <h4>🌐 To play multiplayer online:</h4>
+              <ol>
+                <li>Deploy the server to Railway (see DEPLOYMENT_GUIDE.md)</li>
+                <li>Update the SERVER_URL in this component</li>
+                <li>Redeploy the frontend to Netlify</li>
+              </ol>
+              <p><strong>For local testing:</strong> Make sure the server is running on your computer.</p>
+            </div>
+          )}
         </div>
       )}
 
