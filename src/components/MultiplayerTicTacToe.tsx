@@ -33,7 +33,7 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const SERVER_URL = 'ws://localhost:3001';
+  const SERVER_URL = 'ws://192.168.31.164:3001';
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -187,7 +187,7 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
 
   const fetchAvailableRooms = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/rooms');
+      const response = await fetch('http://192.168.31.164:3001/api/rooms');
       const rooms = await response.json();
       setAvailableRooms(rooms);
     } catch (error) {
