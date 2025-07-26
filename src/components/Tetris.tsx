@@ -118,7 +118,6 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     if (audioInstance) {
       audioInstance.pause();
       audioInstance.currentTime = 0;
-      setAudioInstance(null);
     }
     setMusicPlaying(false);
   };
@@ -376,10 +375,10 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
       <button onClick={startGame} style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: '#00f0f0', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>Restart</button>
       <button
         onClick={() => {
-          if (!musicPlaying) {
-            playMusic();
-          } else {
+          if (musicPlaying) {
             stopMusic();
+          } else {
+            playMusic();
           }
         }}
         style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: musicPlaying ? '#00f0f0' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}
