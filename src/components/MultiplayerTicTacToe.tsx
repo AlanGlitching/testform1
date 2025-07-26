@@ -35,7 +35,7 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
 
   // Try Railway first, fallback to localhost
   const SERVER_URL = window.location.hostname === 'localhost' 
-    ? 'ws://192.168.31.164:3001'
+    ? 'ws://localhost:3001'
     : 'wss://testform1-production.up.railway.app';
 
   // Initialize WebSocket connection
@@ -83,7 +83,8 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
         console.error('WebSocket error:', error);
         const isLocalhost = window.location.hostname === 'localhost';
         const serverUrl = isLocalhost ? 'localhost:3001' : 'Railway server';
-        setError(`Connection error to ${serverUrl}. Please check if the server is running.`);
+        setError(`Connection error to ${serverUrl}. The multiplayer server is currently offline. Please try again later or check the server deployment.`);
+        setStatus('Server offline. Please try again later.');
       };
     } catch (error) {
       console.error('Failed to connect:', error);
@@ -194,7 +195,7 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
     try {
       // Try Railway first, fallback to localhost
       const apiUrl = window.location.hostname === 'localhost' 
-        ? 'http://192.168.31.164:3001/api/rooms'
+        ? 'http://localhost:3001/api/rooms'
         : 'https://testform1-production.up.railway.app/api/rooms';
       const response = await fetch(apiUrl);
       const rooms = await response.json();
