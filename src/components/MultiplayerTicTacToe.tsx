@@ -34,10 +34,10 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // For local development
-  const SERVER_URL = 'ws://192.168.31.164:3001';
+  // const SERVER_URL = 'ws://192.168.31.164:3001';
   
-  // For production deployment, uncomment and replace with your Railway URL:
-  // const SERVER_URL = 'wss://your-app-name.railway.app';
+  // For production deployment
+  const SERVER_URL = 'wss://testform1-production.up.railway.app';
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -192,10 +192,10 @@ const MultiplayerTicTacToe: React.FC<MultiplayerTicTacToeProps> = ({ onBack }) =
   const fetchAvailableRooms = async () => {
     try {
       // For local development
-      const response = await fetch('http://192.168.31.164:3001/api/rooms');
+      // const response = await fetch('http://192.168.31.164:3001/api/rooms');
       
-      // For production deployment, uncomment and replace with your Railway URL:
-      // const response = await fetch('https://your-app-name.railway.app/api/rooms');
+      // For production deployment
+      const response = await fetch('https://testform1-production.up.railway.app/api/rooms');
       const rooms = await response.json();
       setAvailableRooms(rooms);
     } catch (error) {

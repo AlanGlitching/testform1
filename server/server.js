@@ -10,7 +10,7 @@ const wss = new WebSocketServer({ server });
 
 // Middleware
 app.use(cors({
-  origin: ['https://your-netlify-app.netlify.app', 'http://localhost:5173', 'http://localhost:3000'],
+  origin: ['https://testform1-production.up.railway.app', 'http://localhost:5173', 'http://localhost:3000', 'https://*.netlify.app'],
   credentials: true
 }));
 app.use(express.json());
@@ -357,7 +357,7 @@ app.get('/health', (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Tic Tac Toe Server running on port ${PORT}`);
   console.log(`📊 Active games: ${games.size}, Connected players: ${players.size}`);
 });
