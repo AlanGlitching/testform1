@@ -75,17 +75,41 @@ function clearLines(board: any[][]) {
   return { newBoard, cleared };
 }
 
+interface TetrisStats {
+  totalGames: number;
+  totalScore: number;
+  averageScore: number;
+  bestScore: number;
+  gamesPlayed: number;
+  totalLines: number;
+  averageLines: number;
+}
+
 const Tetris = ({ onBack }: { onBack?: () => void }) => {
   const [board, setBoard] = useState(() => Array(BOARD_HEIGHT).fill(0).map(() => Array(BOARD_WIDTH).fill(0)));
   const [current, setCurrent] = useState(randomTetromino());
   const [next, setNext] = useState(randomTetromino());
   const [score, setScore] = useState(0);
+  const [lines, setLines] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [highScore, setHighScore] = useState(0);
   const [gameState, setGameState] = useState<'start' | 'playing' | 'paused' | 'gameover'>('start');
+  const [gameStats, setGameStats] = useState<TetrisStats>({
+    totalGames: 0,
+    totalScore: 0,
+    averageScore: 0,
+    bestScore: 0,
+    gamesPlayed: 0,
+    totalLines: 0,
+    averageLines: 0
+  });
   const dropRef = useRef<any>();
   const repeatRef = useRef<{ [key: string]: NodeJS.Timeout | null }>({});
   const dasRef = useRef<{ [key: string]: NodeJS.Timeout | null }>({});
+  const scoreSavedRef = useRef(false);
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [audioInstance, setAudioInstance] = useState<HTMLAudioElement | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   // Start or restart the game
   function startGame() {
@@ -93,7 +117,12 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     setCurrent(randomTetromino());
     setNext(randomTetromino());
     setScore(0);
+    setLines(0);
+    setLevel(1);
     setGameState('playing');
+    scoreSavedRef.current = false;
+    localStorage.setItem('tetrisGameStartTime', Date.now().toString());
+    playSound('levelup'); // Play start sound
     if (!musicPlaying) {
       playMusic();
     }
@@ -131,6 +160,88 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
       playMusic();
     }
   };
+
+  // Sound effect functions
+  const playSound = (soundName: string) => {
+    if (!soundEnabled) return;
+    
+    const audio = new Audio();
+    audio.volume = 0.4;
+    
+    // Create different sound effects using Web Audio API for better quality
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    let frequency = 440;
+    let duration = 0.1;
+    
+    switch (soundName) {
+      case 'move':
+        frequency = 800;
+        duration = 0.05;
+        break;
+      case 'rotate':
+        frequency = 1000;
+        duration = 0.08;
+        break;
+      case 'drop':
+        frequency = 200;
+        duration = 0.15;
+        break;
+      case 'line':
+        frequency = 1200;
+        duration = 0.2;
+        break;
+      case 'tetris':
+        frequency = 1500;
+        duration = 0.3;
+        break;
+      case 'gameover':
+        frequency = 150;
+        duration = 0.5;
+        break;
+      case 'levelup':
+        frequency = 800;
+        duration = 0.25;
+        break;
+    }
+    
+    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+    oscillator.type = 'square';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+  };
+
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled);
+  };
+
+  // Initialize high score and stats from localStorage
+  useEffect(() => {
+    const savedHighScore = localStorage.getItem('tetrisHighScore');
+    const savedStats = localStorage.getItem('tetrisGameStats');
+    
+    if (savedHighScore) {
+      setHighScore(parseInt(savedHighScore));
+    }
+    
+    if (savedStats) {
+      setGameStats(JSON.parse(savedStats));
+    }
+  }, []);
+
+  // Save stats to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('tetrisGameStats', JSON.stringify(gameStats));
+  }, [gameStats]);
 
   // Cleanup audio on unmount
   useEffect(() => {
@@ -214,19 +325,88 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     const moved = { ...current, x: current.x + dx, y: current.y + dy };
     if (!checkCollision(board, moved)) {
       setCurrent(moved);
+      if (dx !== 0) playSound('move');
+      if (dy === 1) playSound('drop'); // Soft drop sound
       return true;
     } else if (dy === 1) {
       // Piece landed
+      playSound('drop'); // Piece lock sound
       const merged = merge(board, current);
       const { newBoard, cleared } = clearLines(merged);
-      setScore(s => s + cleared * 100);
+      
+      // Enhanced scoring system
+      const linePoints = [0, 100, 300, 500, 800]; // 0, 1, 2, 3, 4 lines
+      const newScore = score + linePoints[cleared] * level;
+      const newLines = lines + cleared;
+      const newLevel = Math.floor(newLines / 10) + 1;
+      
+      // Play sound effects for line clearing
+      if (cleared > 0) {
+        if (cleared === 4) {
+          playSound('tetris');
+        } else {
+          playSound('line');
+        }
+      }
+      
+      // Play level up sound
+      if (newLevel > level) {
+        playSound('levelup');
+      }
+      
+      setScore(newScore);
+      setLines(newLines);
+      setLevel(newLevel);
+      
       const nextTetro = { ...next, x: 3, y: 0 };
       if (checkCollision(newBoard, nextTetro)) {
+        // Only save score if not already saved (prevent duplicates)
+        if (!scoreSavedRef.current) {
+          scoreSavedRef.current = true;
+          
+          // Save individual score
+          const gameStartTime = localStorage.getItem('tetrisGameStartTime');
+          const duration = gameStartTime ? Math.floor((Date.now() - parseInt(gameStartTime)) / 1000) : 0;
+          
+          const newScoreRecord = {
+            id: Date.now().toString(),
+            score: newScore,
+            lines: newLines,
+            level: newLevel,
+            date: new Date().toISOString(),
+            duration: duration
+          };
+          
+          const existingScores = localStorage.getItem('tetrisScores');
+          const scores = existingScores ? JSON.parse(existingScores) : [];
+          scores.push(newScoreRecord);
+          localStorage.setItem('tetrisScores', JSON.stringify(scores));
+          
+          // Game over - update statistics
+          const newStats = {
+            totalGames: gameStats.totalGames + 1,
+            totalScore: gameStats.totalScore + newScore,
+            averageScore: Math.round((gameStats.totalScore + newScore) / (gameStats.totalGames + 1)),
+            bestScore: Math.max(gameStats.bestScore, newScore),
+            gamesPlayed: gameStats.gamesPlayed + 1,
+            totalLines: gameStats.totalLines + newLines,
+            averageLines: Math.round((gameStats.totalLines + newLines) / (gameStats.gamesPlayed + 1))
+          };
+          setGameStats(newStats);
+          
+          if (newScore > highScore) {
+            setHighScore(newScore);
+            localStorage.setItem('tetrisHighScore', newScore.toString());
+          }
+        }
+        
+        playSound('gameover');
         setGameState('gameover');
       } else {
         setBoard(newBoard);
         setCurrent(nextTetro);
         setNext(randomTetromino());
+        playSound('move'); // Piece spawn sound
       }
     }
     return false;
@@ -237,6 +417,7 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     const rotated = { ...current, shape: rotate(current.shape) };
     if (!checkCollision(board, rotated)) {
       setCurrent(rotated);
+      playSound('rotate');
     }
   }
 
@@ -246,18 +427,85 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
     while (!checkCollision(board, { ...dropped, y: dropped.y + 1 })) {
       dropped.y++;
     }
+    playSound('drop');
     // Lock the piece in place and spawn next
     const merged = merge(board, dropped);
     const { newBoard, cleared } = clearLines(merged);
-    setScore(s => s + cleared * 100);
+    
+    // Enhanced scoring system
+    const linePoints = [0, 100, 300, 500, 800]; // 0, 1, 2, 3, 4 lines
+    const newScore = score + linePoints[cleared] * level;
+    const newLines = lines + cleared;
+    const newLevel = Math.floor(newLines / 10) + 1;
+    
+    // Play sound effects for line clearing
+    if (cleared > 0) {
+      if (cleared === 4) {
+        playSound('tetris');
+      } else {
+        playSound('line');
+      }
+    }
+    
+    // Play level up sound
+    if (newLevel > level) {
+      playSound('levelup');
+    }
+    
+    setScore(newScore);
+    setLines(newLines);
+    setLevel(newLevel);
+    
     const nextTetro = { ...next, x: 3, y: 0 };
     if (checkCollision(newBoard, nextTetro)) {
-      setGameState('gameover');
-    } else {
-      setBoard(newBoard);
-      setCurrent(nextTetro);
-      setNext(randomTetromino());
-    }
+      // Only save score if not already saved (prevent duplicates)
+      if (!scoreSavedRef.current) {
+        scoreSavedRef.current = true;
+        
+        // Save individual score
+        const gameStartTime = localStorage.getItem('tetrisGameStartTime');
+        const duration = gameStartTime ? Math.floor((Date.now() - parseInt(gameStartTime)) / 1000) : 0;
+        
+        const newScoreRecord = {
+          id: Date.now().toString(),
+          score: newScore,
+          lines: newLines,
+          level: newLevel,
+          date: new Date().toISOString(),
+          duration: duration
+        };
+        
+        const existingScores = localStorage.getItem('tetrisScores');
+        const scores = existingScores ? JSON.parse(existingScores) : [];
+        scores.push(newScoreRecord);
+        localStorage.setItem('tetrisScores', JSON.stringify(scores));
+        
+        // Game over - update statistics
+        const newStats = {
+          totalGames: gameStats.totalGames + 1,
+          totalScore: gameStats.totalScore + newScore,
+          averageScore: Math.round((gameStats.totalScore + newScore) / (gameStats.totalGames + 1)),
+          bestScore: Math.max(gameStats.bestScore, newScore),
+          gamesPlayed: gameStats.gamesPlayed + 1,
+          totalLines: gameStats.totalLines + newLines,
+          averageLines: Math.round((gameStats.totalLines + newLines) / (gameStats.gamesPlayed + 1))
+        };
+        setGameStats(newStats);
+        
+        if (newScore > highScore) {
+          setHighScore(newScore);
+          localStorage.setItem('tetrisHighScore', newScore.toString());
+        }
+              }
+        
+        playSound('gameover');
+        setGameState('gameover');
+      } else {
+        setBoard(newBoard);
+        setCurrent(nextTetro);
+        setNext(randomTetromino());
+        playSound('move'); // Piece spawn sound
+      }
   }
 
   function togglePause() {
@@ -266,11 +514,13 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
         if (audioInstance) {
           audioInstance.pause();
         }
+        playSound('move'); // Pause sound
         return 'paused';
       } else if (state === 'paused') {
         if (audioInstance && musicPlaying) {
           audioInstance.play();
         }
+        playSound('move'); // Resume sound
         return 'playing';
       }
       return state;
@@ -318,7 +568,10 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
         <div style={overlayStyle}>
           <div style={popupStyle}>
             <h2 style={{ marginBottom: 16 }}>Tetris</h2>
-            <button onClick={startGame} style={buttonStyle}>Start Game</button>
+            <button onClick={() => {
+              playSound('levelup');
+              startGame();
+            }} style={buttonStyle}>Start Game</button>
           </div>
         </div>
       );
@@ -338,8 +591,51 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
         <div style={overlayStyle}>
           <div style={popupStyle}>
             <h2 style={{ marginBottom: 16, color: 'red' }}>Game Over</h2>
-            <div style={{ marginBottom: 16 }}>Score: {score}</div>
-            <button onClick={startGame} style={buttonStyle}>Restart</button>
+            <div style={{ marginBottom: 16 }}>
+              <div>Score: {score}</div>
+              <div>Lines: {lines}</div>
+              <div>Level: {level}</div>
+              {score > highScore && (
+                <div style={{ color: '#fbbf24', fontWeight: 'bold', marginTop: 8 }}>
+                  🏆 New High Score! 🏆
+                </div>
+              )}
+            </div>
+            <div style={{ 
+              marginBottom: 16, 
+              padding: '1rem', 
+              background: 'rgba(255,255,255,0.1)', 
+              borderRadius: '8px',
+              fontSize: '0.9rem'
+            }}>
+              <div style={{ marginBottom: 8, fontWeight: 'bold' }}>Statistics</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>Games: {gameStats.gamesPlayed}</div>
+                <div>Best: {gameStats.bestScore}</div>
+                <div>Avg Score: {gameStats.averageScore}</div>
+                <div>Avg Lines: {gameStats.averageLines}</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button onClick={() => {
+              playSound('levelup');
+              startGame();
+            }} style={buttonStyle}>Restart</button>
+              <button 
+                onClick={() => {
+                  localStorage.removeItem('tetrisHighScore');
+                  localStorage.removeItem('tetrisGameStats');
+                  window.location.reload();
+                }} 
+                style={{
+                  ...buttonStyle,
+                  background: '#ef4444',
+                  color: 'white'
+                }}
+              >
+                Reset Stats
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -386,18 +682,36 @@ const Tetris = ({ onBack }: { onBack?: () => void }) => {
         {renderOverlay()}
         <h1 style={{ fontSize: '2.5rem', margin: '1rem 0' }}>Tetris</h1>
       <button onClick={onBack} style={{ marginBottom: 16, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: '#444', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Back</button>
-      <button onClick={startGame} style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: '#00f0f0', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>Restart</button>
+      <button onClick={() => {
+        playSound('levelup');
+        startGame();
+      }} style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: '#00f0f0', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>Restart</button>
       <button
         onClick={toggleMusic}
         style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: musicPlaying ? '#00f0f0' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}
       >
         {musicPlaying ? 'Pause Music' : 'Play Music'}
       </button>
+      <button
+        onClick={toggleSound}
+        style={{ marginBottom: 16, marginLeft: 8, padding: '0.5rem 1.5rem', borderRadius: 8, border: 'none', background: soundEnabled ? '#00f0f0' : '#888', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}
+      >
+        {soundEnabled ? '🔊 Sound On' : '🔇 Sound Off'}
+      </button>
       <div style={{ display: 'flex', gap: 32 }}>
         <div>{renderBoard()}</div>
-        <div style={{ minWidth: 120 }}>
-          <div style={{ marginBottom: 24 }}>
+        <div style={{ minWidth: 150 }}>
+          <div style={{ marginBottom: 16 }}>
             <b>Score:</b> {score}
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <b>Lines:</b> {lines}
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <b>Level:</b> {level}
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <b>High Score:</b> {highScore}
           </div>
           <div style={{ marginBottom: 24 }}>
             <b>Next:</b>

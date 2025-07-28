@@ -2,8 +2,12 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './Arcade.module.css';
 import PacMan from './PacMan';
 import Tetris from './Tetris';
+import TwoPlayerTetris from './TwoPlayerTetris';
 import TicTacToe from './TicTacToe';
 import MultiplayerTicTacToe from './MultiplayerTicTacToe';
+import SnakeScoreboard from './SnakeScoreboard';
+import TetrisScoreboard from './TetrisScoreboard';
+import SlotMachine from './SlotMachine';
 
 interface SnakeSegment {
   x: number;
@@ -16,11 +20,19 @@ interface Food {
 }
 
 interface ArcadeProps {
-  onBack?: () => void;
+  onBack: () => void;
+}
+
+interface GameStats {
+  totalGames: number;
+  totalScore: number;
+  averageScore: number;
+  bestScore: number;
+  gamesPlayed: number;
 }
 
 const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
-  const [currentGame, setCurrentGame] = useState<'menu' | 'snake' | 'pacman' | 'tetris' | 'tictactoe' | 'multiplayer-tictactoe'>('menu');
+  const [currentGame, setCurrentGame] = useState<'menu' | 'snake' | 'pacman' | 'tetris' | 'twoplayer-tetris' | 'tictactoe' | 'multiplayer-tictactoe' | 'snake-scoreboard' | 'tetris-scoreboard' | 'slotmachine'>('menu');
   const [snake, setSnake] = useState<SnakeSegment[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Food>({ x: 15, y: 15 });
   const [direction, setDirection] = useState<'UP' | 'DOWN' | 'LEFT' | 'RIGHT'>('RIGHT');
@@ -29,17 +41,55 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameSpeed, setGameSpeed] = useState(150);
+  const [level, setLevel] = useState(1);
+  const [gameStats, setGameStats] = useState<GameStats>({
+    totalGames: 0,
+    totalScore: 0,
+    averageScore: 0,
+    bestScore: 0,
+    gamesPlayed: 0
+  });
+  const [tetrisHighScore, setTetrisHighScore] = useState(0);
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
+  const scoreSavedRef = useRef(false);
 
   const GRID_WIDTH = 30;
   const GRID_HEIGHT = 20;
 
-  // Initialize high score from localStorage
+  // Initialize high score and stats from localStorage
   useEffect(() => {
     const savedHighScore = localStorage.getItem('snakeHighScore');
+    const savedStats = localStorage.getItem('snakeGameStats');
+    const savedTetrisHighScore = localStorage.getItem('tetrisHighScore');
+    
     if (savedHighScore) {
       setHighScore(parseInt(savedHighScore));
     }
+    
+    if (savedStats) {
+      setGameStats(JSON.parse(savedStats));
+    }
+    
+    if (savedTetrisHighScore) {
+      setTetrisHighScore(parseInt(savedTetrisHighScore));
+    }
+  }, []);
+
+  // Save stats to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('snakeGameStats', JSON.stringify(gameStats));
+  }, [gameStats]);
+
+  // Listen for Tetris high score changes
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'tetrisHighScore' && e.newValue) {
+        setTetrisHighScore(parseInt(e.newValue));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const generateFood = useCallback(() => {
@@ -57,8 +107,11 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
     setSnake([{ x: 10, y: 10 }]);
     setDirection('RIGHT');
     setScore(0);
+    setLevel(1);
+    setGameSpeed(150);
     setGameOver(false);
     setGameRunning(false);
+    scoreSavedRef.current = false;
     generateFood();
     if (gameLoopRef.current) {
       clearInterval(gameLoopRef.current);
@@ -70,6 +123,7 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
     resetGame();
     setGameRunning(true);
     setCurrentGame('snake');
+    localStorage.setItem('snakeGameStartTime', Date.now().toString());
   }, [resetGame]);
 
   const startPacManGame = useCallback(() => {
@@ -80,12 +134,43 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
     setCurrentGame('tetris');
   }, []);
 
+  const startTwoPlayerTetrisGame = useCallback(() => {
+    setCurrentGame('twoplayer-tetris');
+  }, []);
+
   const startTicTacToeGame = useCallback(() => {
     setCurrentGame('tictactoe');
   }, []);
 
   const startMultiplayerTicTacToeGame = useCallback(() => {
     setCurrentGame('multiplayer-tictactoe');
+  }, []);
+
+  const startSlotMachineGame = useCallback(() => {
+    setCurrentGame('slotmachine');
+  }, []);
+
+  const resetSnakeStats = useCallback(() => {
+    setGameStats({
+      totalGames: 0,
+      totalScore: 0,
+      averageScore: 0,
+      bestScore: 0,
+      gamesPlayed: 0
+    });
+    setHighScore(0);
+    localStorage.removeItem('snakeHighScore');
+    localStorage.removeItem('snakeGameStats');
+  }, []);
+
+
+
+  const openSnakeScoreboard = useCallback(() => {
+    setCurrentGame('snake-scoreboard');
+  }, []);
+
+  const openTetrisScoreboard = useCallback(() => {
+    setCurrentGame('tetris-scoreboard');
   }, []);
 
   const moveSnake = useCallback(() => {
@@ -115,9 +200,42 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
       if (newSnake.some(segment => segment.x === head.x && segment.y === head.y)) {
         setGameOver(true);
         setGameRunning(false);
-        if (score > highScore) {
-          setHighScore(score);
-          localStorage.setItem('snakeHighScore', score.toString());
+        
+        // Only save score if not already saved (prevent duplicates)
+        if (!scoreSavedRef.current) {
+          scoreSavedRef.current = true;
+          
+          // Save individual score
+          const gameStartTime = localStorage.getItem('snakeGameStartTime');
+          const duration = gameStartTime ? Math.floor((Date.now() - parseInt(gameStartTime)) / 1000) : 0;
+          
+          const newScore = {
+            id: Date.now().toString(),
+            score: score,
+            level: level,
+            date: new Date().toISOString(),
+            duration: duration
+          };
+          
+          const existingScores = localStorage.getItem('snakeScores');
+          const scores = existingScores ? JSON.parse(existingScores) : [];
+          scores.push(newScore);
+          localStorage.setItem('snakeScores', JSON.stringify(scores));
+          
+          // Update game statistics
+          const newStats = {
+            totalGames: gameStats.totalGames + 1,
+            totalScore: gameStats.totalScore + score,
+            averageScore: Math.round((gameStats.totalScore + score) / (gameStats.totalGames + 1)),
+            bestScore: Math.max(gameStats.bestScore, score),
+            gamesPlayed: gameStats.gamesPlayed + 1
+          };
+          setGameStats(newStats);
+          
+          if (score > highScore) {
+            setHighScore(score);
+            localStorage.setItem('snakeHighScore', score.toString());
+          }
         }
         return prevSnake;
       }
@@ -126,10 +244,14 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
 
       // Check if snake eats food
       if (head.x === food.x && head.y === food.y) {
-        setScore(prev => prev + 1);
+        const newScore = score + 1;
+        const newLevel = Math.floor(newScore / 5) + 1;
+        setScore(newScore);
+        setLevel(newLevel);
         generateFood();
-        // Increase speed every 5 points
-        if ((score + 1) % 5 === 0 && gameSpeed > 50) {
+        
+        // Increase speed every 5 points (level up)
+        if (newScore % 5 === 0 && gameSpeed > 50) {
           setGameSpeed(prev => prev - 10);
         }
       } else {
@@ -251,6 +373,15 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
             <div className={styles.highScore}>
               High Score: {highScore}
             </div>
+            <div className={styles.gameStats}>
+              Games: {gameStats.gamesPlayed} | Avg: {gameStats.averageScore}
+            </div>
+            <button className={styles.scoreboardButton} onClick={(e) => {
+              e.stopPropagation();
+              openSnakeScoreboard();
+            }}>
+              📊 View Scoreboard
+            </button>
           </div>
 
           <div className={styles.gameCard} onClick={startPacManGame} style={{ borderColor: 'yellow', color: 'yellow' }}>
@@ -267,11 +398,26 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
             <h2>Tetris</h2>
             <p>Stack the blocks and clear lines!</p>
             <div className={styles.highScore}>
-              Classic Puzzle Game
+              High Score: {tetrisHighScore}
+            </div>
+            <button className={styles.scoreboardButton} onClick={(e) => {
+              e.stopPropagation();
+              openTetrisScoreboard();
+            }}>
+              📊 View Scoreboard
+            </button>
+          </div>
+
+          <div className={styles.gameCard} onClick={startTwoPlayerTetrisGame} style={{ borderColor: '#ff6b6b', color: '#ff6b6b' }}>
+            <div className={styles.gameIcon}>👥</div>
+            <h2>Two Player Tetris</h2>
+            <p>Compete with a friend on the same screen!</p>
+            <div className={styles.highScore}>
+              Local Multiplayer
             </div>
           </div>
 
-          <div className={styles.gameCard} onClick={startTicTacToeGame} style={{ borderColor: '#ff6b6b', color: '#ff6b6b' }}>
+          <div className={styles.gameCard} onClick={startTicTacToeGame} style={{ borderColor: '#4CAF50', color: '#4CAF50' }}>
             <div className={styles.gameIcon}>⭕</div>
             <h2>Tic Tac Toe</h2>
             <p>Classic X's and O's game!</p>
@@ -286,6 +432,15 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
             <p>Play with friends across devices!</p>
             <div className={styles.highScore}>
               Online Multiplayer
+            </div>
+          </div>
+
+          <div className={styles.gameCard} onClick={startSlotMachineGame} style={{ borderColor: '#ffd700', color: '#ffd700' }}>
+            <div className={styles.gameIcon}>🎰</div>
+            <h2>777 Slot Machine</h2>
+            <p>Try your luck with classic slot machine!</p>
+            <div className={styles.highScore}>
+              Casino Game
             </div>
           </div>
           
@@ -311,6 +466,12 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
     );
   }
 
+  if (currentGame === 'twoplayer-tetris') {
+    return (
+      <TwoPlayerTetris onBack={() => setCurrentGame('menu')} />
+    );
+  }
+
   if (currentGame === 'tictactoe') {
     return (
       <TicTacToe onBack={() => setCurrentGame('menu')} />
@@ -323,6 +484,24 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
     );
   }
 
+  if (currentGame === 'snake-scoreboard') {
+    return (
+      <SnakeScoreboard onBack={() => setCurrentGame('menu')} />
+    );
+  }
+
+  if (currentGame === 'tetris-scoreboard') {
+    return (
+      <TetrisScoreboard onBack={() => setCurrentGame('menu')} />
+    );
+  }
+
+  if (currentGame === 'slotmachine') {
+    return (
+      <SlotMachine onBack={() => setCurrentGame('menu')} />
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.gameHeader}>
@@ -330,6 +509,7 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
           <h2>🐍 Snake Game</h2>
           <div className={styles.scoreBoard}>
             <div className={styles.score}>Score: {score}</div>
+            <div className={styles.level}>Level: {level}</div>
             <div className={styles.highScore}>High Score: {highScore}</div>
           </div>
         </div>
@@ -346,10 +526,28 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
         {gameOver && (
           <div className={styles.gameOver}>
             <h2>Game Over!</h2>
-            <p>Final Score: {score}</p>
-            <button className={styles.restartButton} onClick={resetGame}>
-              Play Again
-            </button>
+            <div className={styles.gameOverStats}>
+              <p>Final Score: {score}</p>
+              <p>Level Reached: {level}</p>
+              {score > highScore && <p className={styles.newRecord}>🏆 New High Score! 🏆</p>}
+            </div>
+            <div className={styles.gameStats}>
+              <h3>Game Statistics</h3>
+              <div className={styles.statsGrid}>
+                <div>Games Played: {gameStats.gamesPlayed}</div>
+                <div>Best Score: {gameStats.bestScore}</div>
+                <div>Average Score: {gameStats.averageScore}</div>
+                <div>Total Score: {gameStats.totalScore}</div>
+              </div>
+            </div>
+            <div className={styles.gameOverButtons}>
+              <button className={styles.restartButton} onClick={resetGame}>
+                Play Again
+              </button>
+              <button className={styles.resetStatsButton} onClick={resetSnakeStats}>
+                Reset Stats
+              </button>
+            </div>
           </div>
         )}
 
@@ -358,6 +556,7 @@ const Arcade: React.FC<ArcadeProps> = ({ onBack }) => {
             <h2>Snake Game</h2>
             <p>Use arrow keys to control the snake</p>
             <p>Eat berries to grow and score points</p>
+            <p>Current Level: {level}</p>
             <button className={styles.startButton} onClick={() => setGameRunning(true)}>
               Start Game
             </button>
