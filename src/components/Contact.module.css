@@ -126,6 +126,41 @@ input:-internal-autofill-selected {
   font-style: italic;
 }
 
+.formGroup textarea {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 3px solid #667eea !important;
+  border-radius: 15px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  background: #f8f9fa !important;
+  color: #333 !important;
+  background-clip: padding-box !important;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.formGroup textarea:focus {
+  outline: none !important;
+  border-color: #764ba2 !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.formGroup textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #e9ecef !important;
+}
+
+.formGroup textarea::placeholder {
+  color: #999 !important;
+  opacity: 1;
+  font-style: italic;
+}
+
 .fieldError {
   color: #dc3545;
   font-size: 0.85rem;

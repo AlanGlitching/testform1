@@ -10,7 +10,8 @@ const Contact: React.FC<ContactProps> = ({ onBack }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    comment: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -57,7 +58,7 @@ const Contact: React.FC<ContactProps> = ({ onBack }) => {
     return /^\d{10}$/.test(cleaned);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
     if (name === 'phone') {
@@ -116,6 +117,7 @@ const Contact: React.FC<ContactProps> = ({ onBack }) => {
             name: formData.name,
             email: formData.email,
             phone: formData.phone || null,
+            comment: formData.comment || null,
             created_at: new Date().toISOString()
           }
         ])
@@ -130,7 +132,7 @@ const Contact: React.FC<ContactProps> = ({ onBack }) => {
 
       console.log('Contact form submitted successfully:', data);
       setSubmitStatus('success');
-      setFormData({ name: '', email: '', phone: '' });
+      setFormData({ name: '', email: '', phone: '', comment: '' });
       setPhoneError('');
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -219,6 +221,24 @@ const Contact: React.FC<ContactProps> = ({ onBack }) => {
             )}
             <small className={styles.helpText}>
               💡 For US numbers: (555) 123-4567 | For international: +1 555 123 4567
+            </small>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="comment">What's on your mind? 💭</label>
+            <textarea
+              id="comment"
+              name="comment"
+              value={formData.comment}
+              onChange={handleInputChange}
+              placeholder="Tell me about your project, ask questions, or just say hello! ✨"
+              disabled={isSubmitting}
+              rows={4}
+              maxLength={1000}
+              className={styles.textarea}
+            />
+            <small className={styles.helpText}>
+              💡 Share your ideas, questions, or just drop a friendly message! (max 1000 characters)
             </small>
           </div>
 
