@@ -9,7 +9,7 @@
 
 .header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   color: white;
 }
 
@@ -35,7 +35,7 @@
 
 .form {
   background: #f3f4f8 !important; /* slightly off-white for contrast */
-  padding: 2.5rem;
+  padding: 2rem;
   border-radius: 25px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -66,7 +66,7 @@
 }
 
 .formGroup {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .formGroup label {
@@ -139,7 +139,8 @@ input:-internal-autofill-selected {
   background-clip: padding-box !important;
   font-family: inherit;
   resize: vertical;
-  min-height: 120px;
+  min-height: 100px;
+  max-height: 200px;
 }
 
 .formGroup textarea:focus {
@@ -182,7 +183,7 @@ input:-internal-autofill-selected {
 .formActions {
   display: flex;
   gap: 1rem;
-  margin-top: 2.5rem;
+  margin-top: 2rem;
   flex-wrap: wrap;
 }
 
