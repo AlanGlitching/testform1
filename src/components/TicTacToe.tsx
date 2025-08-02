@@ -173,22 +173,6 @@ const TicTacToe: React.FC<TicTacToeProps> = ({ onBack }) => {
 
   // Removed minimax function to prevent infinite thinking
 
-  const getAIMove = (boardState: BoardState): number => {
-    const availableMoves = getAvailableMoves(boardState);
-    if (availableMoves.length === 0) return -1;
-    
-    switch (aiDifficulty) {
-      case 'easy':
-        return getEasyAIMove(boardState);
-      case 'medium':
-        return getMediumAIMove(boardState);
-      case 'hard':
-        return getHardAIMove(boardState);
-      default:
-        return getMediumAIMove(boardState);
-    }
-  };
-
   const handleCellClick = (index: number) => {
     if (board[index] || winner || isAITurn || !gameStarted || index < 0 || index >= 9) return;
 

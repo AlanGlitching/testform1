@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 interface SlotSymbol {
   id: string;
@@ -20,7 +20,6 @@ const SLOT_SYMBOLS: SlotSymbol[] = [
 
 // Casino-style win rate control
 const CASINO_WIN_RATE = 0.0000001; // 0.00001% win rate (practically zero for ALL wins)
-const CASINO_RTP = 0.001; // 0.1% Return to Player (casino keeps 99.9%)
 const JACKPOT_CHANCE = 0.00000001; // 0.000001% chance for jackpot (never happens)
 
 // Weighted symbol selection for lower win rates
@@ -120,8 +119,6 @@ const SlotMachine = ({ onBack }: SlotMachineProps) => {
   ]);
   const [winAmount, setWinAmount] = useState(0);
   const [winLines, setWinLines] = useState<number[]>([]);
-  const [musicPlaying, setMusicPlaying] = useState(false);
-  const [audioInstance, setAudioInstance] = useState<HTMLAudioElement | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [gameStats, setGameStats] = useState({
     totalSpins: 0,
