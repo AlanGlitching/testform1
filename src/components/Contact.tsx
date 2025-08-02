@@ -102,13 +102,17 @@ const Contact: React.FC<ContactProps> = ({ onBack }) => {
 
     if (!supabaseUrl || !supabaseAnonKey) {
       setSubmitStatus('error');
-      setErrorMessage('Oops! The contact form isn\'t set up yet. Drop me a DM instead! 😊');
+      setErrorMessage('😁 Network hiccup! Check your connection and try again! 🌐');
       setIsSubmitting(false);
       return;
     }
 
     try {
       console.log('Attempting to insert data:', formData);
+      
+      if (!supabase) {
+        throw new Error('Supabase client not configured');
+      }
       
       const { data, error } = await supabase
         .from('contacts')
